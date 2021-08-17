@@ -1,0 +1,269 @@
+body{
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+nav{
+    background-color: black;
+    padding: 3px 0 1px 0;
+    color: white;
+    opacity: 0.8;
+}
+ul{
+    list-style-type: none;
+}
+li{
+    display: inline-block;
+    margin-right: 5px;
+}
+li:nth-child(4) {
+    font-size: 200%;
+    margin-left: 300px;
+}
+
+li:nth-child(5) {
+    margin-left:300px
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+a:hover{
+    text-decoration: underline;
+}
+
+header, p {
+  margin: 0;
+  padding: 0;
+}
+
+.hide{
+    display: none;
+}
+
+
+section#top.show {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin: auto;
+}
+
+section#top div{
+    width: 50%;
+    min-height: 200px;  
+    margin: 0px;
+    border-style: solid;
+    border-width: 0px;
+    max-height: 400px;
+    overflow: scroll
+}
+
+section#top div:nth-child(1) {
+    border-width: 1px 0.5px 0.5px 1px;
+}
+
+section#top div:nth-child(2) {
+    border-width: 1px 1px 0.5px 0.5px;
+}
+
+section#top div:nth-child(3) {
+    border-width: 1px 0.5px 0.5px 1px;
+}
+
+section#top div:nth-child(4) {
+    border-width: 1px 1px 0.5px 0.5px;
+}
+
+
+
+section#middle.show {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin: auto;
+}
+
+
+section#middle div.table{
+    width: 50%;
+    border-style: solid;
+    border-width: 0px;
+    margin: 0px;
+    min-height: 200px;
+    max-height:500px;
+    overflow: scroll;
+}
+
+section#middle div.table:nth-child(1) {
+    border-width: 0.5px 0.5px 1px 1px;
+}
+
+
+section#middle div.table:nth-child(2) {
+    border-width: 0.5px 1px 1px 0.5px;
+}
+
+section#bottom.show {
+    display: flex;
+    flex-direction: row;
+    width: 100;
+    margin: auto;
+}
+
+
+section#bottom div.table{
+    width: 50%;
+    border-style: solid;
+    border-width: 0px;
+    margin: 0px;
+    overflow:scroll;
+    min-height: 200px;
+    max-height:500px;
+}
+
+section#bottom div.table:nth-child(1) {
+    border-width: 0.5px 0.5px 1px 1px;
+}
+
+
+section#bottom div.table:nth-child(2) {
+    border-width: 0.5px 1px 1px 0.5px;
+}
+
+
+
+.ENSG_ID:hover{
+    text-decoration-color: cornflowerblue;
+    text-decoration: underline ;
+}
+
+.Symbol_ID:hover {
+    text-decoration-color: cornflowerblue;
+    text-decoration: underline ;
+}
+
+.rs_ID:hover {
+    text-decoration-color: cornflowerblue;
+    text-decoration: underline ;
+}
+
+.ENST_ID:hover {
+    text-decoration-color: cornflowerblue;
+    text-decoration: underline ;
+}
+
+section.inputarea{
+    color: white;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 130px;
+    margin: auto;
+
+}
+
+
+section.inputarea div{
+    background-color: black;
+    padding-top: 5px;
+    padding-left: 4px;
+    width: 25%;
+    border-style: solid;
+    border-width: 0.5px;
+}
+
+section.inputarea div button{
+    border-radius: 5%;
+}
+
+section.protein img{
+    margin:auto;
+    width: 400px;
+    height: 400px;
+}
+
+h1.contact {
+    text-align: center;
+    color: blueviolet;
+}
+
+p.contact{
+    text-align: center;
+}
+
+#contact_form {
+    text-align: center;
+}
+
+input.contact {
+    width: 30%;
+    height: 30px;
+    border: none;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+}
+
+textarea.contact_message {
+    overflow-y: auto;
+    width: 30%;
+    height: 100px;
+    text-align: justify;
+    border: none;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+}
+
+#contact_submit {
+    width: 30%;
+    height: 30px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+}
+
+h1 {
+   text-align: center;
+   font-size:100%;
+   padding: 0;
+}
+
+h4 {
+   text-align:right;
+   font-size: 70%;
+   color: blue;
+   padding: 0;
+}
+
+h4:hover {
+    text-decoration-color: cornflowerblue;
+    text-decoration: underline ;
+}
+
+.loader {
+  margin: 0 auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loadtext {color:blue}
+

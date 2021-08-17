@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ViewProtein</title>
+    </head>
+<style>
+.loader {
+  margin:0 auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  
+#loadtext {color:blue}
+
+#table2{
+    height: 300px;
+    overflow: scroll;
+}
+</style>
+    <body>
+       <header>
+            <nav>
+                <ul>
+                    <li><a href="https://bioed.bu.edu/students_20/groupE/new_webpage.html">Home</a></li>
+                    <li><a href="https://bioed.bu.edu/students_20/groupE/tutorial.html">Tutorial</a></li>
+                    <li><a href="https://bioed.bu.edu/students_20/groupE/webpage_contact.html">Contact</a></li>
+                    <li><strong>Gene2Protein</strong></li>
+                    <li><img src='https://bioed.bu.edu/images/students_20/xdhan/bulogo.png' alt='BU logo' width="90px" height="35px"/></li>
+
+                </ul>
+            </nav>
+        </header>
+
+
+        <div>
+        View 3D Structure:&nbsp;&nbsp;<input type="button" id="view" value="View3D">
+        <form id='res' class="hide"> 
+        residue_num<input type='text' id='residue' name='residue'><br>
+        chain_num<input type='text' id='chain' name='chain'><br>
+        <input type='submit' id='viewbyr' value='View Residue'>
+        </form>
+        <form id='snp' class="hide">
+        SNP ID<input type='text' id='snpID' name='snpID'><br>
+        <input type='submit' id='viewbys' value='View SNP'>
+        </form>
+	<!--<p>above has the link to see protein</p>-->
+        </div>
+        <div class="hide" id="table1">
+            <h1>Nearby Information</h1>
+            <h4 class="hide" id='nearbydownload'>Download</h4>
+            <table id="nearby_snp" class='tablesorter'>
+            </table>
+            <div class="unload"></div>
+            <p id="loadtext1" align="center">loading table</p>
+        </div>
+        <h1 align="center">SNP Information</h1>
+
+        <div class="table" id="table2">
+            <h4 class="hide" id='snpdownload'>Download</h4>
+            <table id="protein_snp" class='hide'>
+            </table>
+            <div class="unload"></div>
+            <p id="loadtext2" align="center" class="hide">loading table</p>
+        </div>
+        <div class="link">
+        </div>
+        <script type="text/javascript" src="https://chemapps.stolaf.edu/jmol/jmol.php?pdbid=2HEY&link=protein_highlighted&script=restrict not water; spacefill off; wireframe off; ribbons on; select 211:R; color red; spacefill 2.0&inline">
+        </script>
+        <link rel="stylesheet" href="css/theme.blue.css">
+        <link rel="stylesheet" href="webpage.css">
+        <link rel="stylesheet" href="bluetable.css">
+        <!-- load jQuery and tablesorter scripts -->
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="table2csv.js"></script> 
+        <link rel="icon" href="data:;base64,=">
+        <script>
+        $(function(){
+            var url = window.location.href;
+            PDB = url.split('=')[1];
+            PDB = PDB.split('&')[0];
+
+            $("#view").on('click',function(){
+                View3D();
+            });
+
+            $('h4').on('click',function(event) {
+                $(event.target).next().table2csv({
+                 	"separator": ",",
+	                "newline": "\n",
+	                "quoteFields": true,
+	                "excludeColumns": "",
+	                "excludeRows": "",
+ 	                "trimContent": true,
+	                "filename": "table.csv",
+                 });
+            });
+
+            $("#res").on("submit",function(event){
+                event.preventDefault();
+                Viewres();
+            });
+            $("#snp").on("submit",function(event){
+                event.preventDefault();
+                Viewsnp();
+            });
+
+
+            $('#protein_snp').on("click","td.rs_ID",function(event){
+                $('#protein_snp td.rs_ID').css({"fontWeight":"normal"})
+                var SNP=$(this).html();
+                $(this).css({"fontWeight":"bold"});
+                
+                ClickSNP(event);
+            });
+            
+            function View3D(){
+                $("div.link").empty();
+                $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=select+protein+or+nucleic%3Bcartoons+only%3Bcolor+structure&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein3D</a>');
+                $("div.link a").trigger('click');
+            };
+                
+            if (PDB!==""){
+               ShowTable(PDB);}
+            
+            function ShowTable(PDB){
+                $("div.unload").attr("class","loader");
+                $("#loadtext").attr("class","");
+                $.ajax({
+                   url: 'https://bioed.bu.edu/cgi-bin/students_20/groupE/protein_snp.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                
+                        $('#protein_snp').empty();
+                        $("#protein_snp").append("<thead><tr><th> SNP </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                            row = value.split("\t");
+                            //alert(row);                       
+                            $('#protein_snp').append("<tr><td class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td></tr>");         
+                        });
+                        $('#protein_snp').append("</tbody>");
+                        $("#res").attr("class","");
+                        $("#snp").attr("class","");
+                        //$("#loading-image").attr("class","hide");
+                        $("#protein_snp").attr("class","tablesorter");
+                        $("div.loader").attr("class","unload");
+                        $("#loadtext").attr("class","hide");
+                        $("#protein_snp").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                            });
+                        }
+                    $("#snpdownload").attr('class','');
+                     
+                    }
+                });
+            };
+                
+             
+            //function Plot3(PDB){
+            //    $.ajax({
+            //       url: 'https://bioed.bu.edu/cgi-bin/students_20/groupE/test_update_pdb_image.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','PDB':PDB},
+            //        success: function(response) {
+            //            var rightnow = new Date();
+            //            $("#plot_pdb").attr('src','https://bioed.bu.edu/images/students_20/xinyusun/highlight_pdb.png?'+rightnow.getTime());
+                        
+            //        }
+            //   }); 
+            //    $.ajax({
+            //        url: 'https://bioed.bu.edu/cgi-bin/students_20/groupE/protein_snp.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','PDB':PDB},
+            //        success: function(response) {
+            //            var lines = response.trim().split('\n');
+            //    
+            //            $('#protein_snp').empty();
+            //            $("#protein_snp").append("<tr><th> SNP </th><th> chr </th><th> Position </th></tr>");
+            //            lines.forEach(function(value){
+            //                row = value.split("\t");
+            //                //alert(row);                       
+            //                $('#protein_snp').append("<tr><td>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td></tr>");         
+            //            })
+        
+            
+            function ClickSNP(event){
+                chain = $(event.target).nextAll().eq(2).html();
+                residue = $(event.target).nextAll().eq(3).html();
+                //alert(chain);
+                //alert(residue);
+                $("div.link").empty();
+                $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+2.0&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+
+                $("div.link a").trigger('click');
+                ShowTable_nearSNP(PDB,residue,chain);
+            };
+
+            function Viewres(){
+                residue = $("#residue").val();
+                chain = $("#chain").val();
+                judge = false;
+                $("#protein_snp tbody td:nth-child(4)").each(function(){
+                    if(chain==$(this).html() && residue==$(this).next().html()){
+                       
+                        judge=true;
+                        return false;
+                    }
+                });
+                if (judge){
+                    $("div.link").empty();
+                    $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+2.0&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');               
+                    $("div.link a").trigger("click");
+                    ShowTable_nearSNP(PDB,residue,chain);
+                }
+                else{alert('Your Input is Not Found')}
+            };
+
+            function Viewsnp(){
+                snp = $("#snpID").val();
+                judge = false;
+                $("#protein_snp tbody td:nth-child(1)").each(function(){
+                    if(snp==$(this).html()){
+                        judge = true;
+                        residue = $(this).nextAll().eq(3).html();
+                        chain = $(this).nextAll().eq(2).html()
+                        return false;
+                    }
+                });
+                if (judge){
+                    $("div.link").empty();
+                    $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+2.0&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+                    $("div.link a").trigger("click");
+                    ShowTable_nearSNP(PDB,residue,chain);
+                }
+                else{alert('Your Input is Not Found')}
+            };
+
+            function ShowTable_nearSNP(PDB,residue,chain){ 
+                        $("#table1").attr("class","table");
+                        $("#table1 .unload").attr("class","loader");
+                        $("#table1 p").attr("class","");
+                        $("#nearbydownload").attr("class","hide");                
+                $.ajax({
+                   url: 'https://bioed.bu.edu/cgi-bin/students_20/groupE/find_nearby_SNPs.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB,'residue':residue,'chain':chain},
+                    success: function(response) {
+                        if (!$.trim(response)){
+                            alert("No information for Nearby SNP for this SNP!");
+                            $("#table1").attr("class","hide");}
+                        else{
+                        var lines = response.trim().split('\n');
+                        //alert(response)
+                        //$("#table1").attr("class","table");
+                        //$("#table1 .unload").attr("class","loader");
+                        //$("#table1 p").attr("class","");
+                        //$("#nearbydownload").attr("class","hide");
+
+                        $('#nearby_snp').empty();
+                        $("#nearby_snp").append("<thead><tr><th> Chain </th><th> Residue </th><th> SNP </th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                            row = value.split("\t");
+                            //alert(row);
+                            $('#nearby_snp').append("<tr><td>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td></tr>");
+                        });
+                        $('#nearby_snp').append("</tbody>");
+                        $("#table1 h4").attr('class','');
+                        //$("#nearby_snp").attr("class","tablesorter");
+                        $("#table1 .loader").attr("class","unload");
+                        $("#table1 p").attr("class","hide");
+                        $("#nearby_snp").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                            });
+                        }
+                        $("#nearbydownload").attr("class","");
+                        }
+                    }
+                });
+            };
+
+        });
+        </script>
+
+    </body>
+</html>
