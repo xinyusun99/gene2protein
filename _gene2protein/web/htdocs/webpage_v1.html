@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+     <meta charset="utf-8">
+     <title>Gene2Protein</title>
+     <!--link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css"-->
+    </head>
+<style>
+.loader {
+  margin: 0 auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loadtext {color:blue}
+</style>
+
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li style='margin-left:1350px;'><img src='http://localhost:8080/bulogo.png' alt='BU logo' width="85%" height="85%"/></li>
+                    <center><strong style='font-size:30px'>Gene2Protein</strong></center>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_v1.html">Home</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/tutorial.html">Tutorial</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_contact.html">Contact</a></li> 
+
+                </ul>
+            </nav>
+        </header>
+    
+        <section class = "inputarea">
+            <div class="geneinput">
+                <form id = "gene-panel" action="http://localhost:8080/webpage_v1.html" method="GET">
+                    &nbsp;&nbsp;Gene Symbol&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="symbol" name="symbol" placeholder="e.g., MAPT" size="10" >
+                    <center>ENSG ID&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="ENSG" name="ENSG" placeholder="e.g., ENSG00000186868" size="20"></center>
+                   <!-- Chr:BP-BP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="Chr" placeholder="e.g., 17: 45894382-46028334" size="25">--><br/>
+                    <center><input type="submit" id="genesubmit" value="Search Gene">&nbsp;&nbsp;
+                    <input type= "reset" id="genereset" value="Reset"></center>
+                </form>
+            </div>
+
+            <div class="chromosome">
+                <form id = 'range-panel' action="http://localhost:8080/webpage_v1.html" method="GET">
+                    <center><label for = "Chr">Chromosome&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <select id = "Chr" name="Chr">
+                        <option value="*">-Select-</option>
+                    </select><br/>
+                    </center>
+                    <center>From&nbsp;<input type="text" id="start" name="start" width="15"></center>
+                    <center>To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="end" name="end" width="15"></center>
+                    <center><input type="submit" id="viewrange" value="View Range" class="hide"></center>
+                </form>
+
+                <!--<form id = "iso-panel">
+                    ENST ID (Isoform) <input type="text" id="ENST" name="ENST" placeholder="e.g., ENST00000446361.3"> <br />
+                    <input type="submit" id="isosubmit" value="Search Isoform">&nbsp;&nbsp;
+                    <input type="reset" id = "isoreset" value="Reset">
+                </form>-->    
+            </div>
+            <div class="snp">
+                <form id = "snp-panel" action="http://localhost:8080/webpage_v1.html" method="GET">
+                    <br>
+                    <center>SNP ID&nbsp;&nbsp;&nbsp;<input type="text" id="SNP" name="SNP" placeholder="e.g., rs1032974141"></center><br>
+                    <!--Base Position <input type="text" id="base" name="base" placeholder="e.g., chr17:45894679"><br />-->
+                    <center>
+                    <input type="submit" id="snpsubmit" value="Search SNP">&nbsp;&nbsp;
+                    <input type="reset" id = "snpreset"value="Reset">
+                    </center>
+                </form>
+            </div>
+            <div class="PDB">
+                <form id = "PDB-panel">
+                    <br>
+                    <center>PDBID &nbsp;<input type="text" id ="PDB" name="PDB" placeholder="e.g., 2HEY"></center><br>
+                    <center><input type="submit" id="pdbsubmit" name="pdbsubmit" value="View Protein"></center>
+                </form>
+            </div>
+        </section>
+        <section id='homepage'> 
+        <img src="http://localhost:8080/gene_isoform_browser.png" width=20% height=20% style='float:left'></img>
+        <img src="http://localhost:8080/Protein3D_SNP.png" width=15% height=15% style='float:right'></img>
+        <div id='intro' class="introduction" style='margin:0 auto;width:800px;float:center;'>
+            <h2 align='center' style='color:dodgerblue;'>Introduction</h2>
+            <p style='text-align:justify;'><strong>Single-nucleotide polymorphisms (SNPs)</strong> can affect how humans develop diseases, respond to pathogens, chemical drugs and other agents due to the changes in protein structure. However, current software tools limit the connection between SNP genotypes and protein structure data.</p> <br>
+            <p style='text-align:justify;'>In this project, we developed part of the software that links the SNPs to the protein: interactive viewing of the amino acid in 3-dimensional protein structure encoded by a particular SNP and mapping a coding SNP to the corresponding location in a three-dimensional protein structure.</p> <br>
+            <p style='text-align:justify;'>Additionally, we also provide gene and isoform information and structure visualization as well as the SNP annotation collected from GWAS catalog, Gnomad, Variant Effect Predictor and LocusZoom.</p> <br>
+            <p>The reference genome was <strong>GRCH37 (hg19)</strong>. </p><br>
+            <p style='text-align:justify;'>This database allow users to input gene symbol or ENSG (ensembl gene ID), gene coordinate, SNP ID, SNP position and PDBID to obtain information.</p><br>
+            <p style='text-align:justify;'>The project was developed at Boston University as part of BF768, Spring 2020, G. Benson instructor. </p><br>
+            <p style='text-align:center;'><strong>Author: Xudong Han*,Jinghan Huang*,Xinyu Sun*</strong></p><br>
+            <p style='text-align:center;'><strong>Instructor:Dr.Jaeyoon Chung; Dr.Gary Benson</strong></p><br>
+            <p style='text-align:center;'><strong>Department of Bioinformatics & Department of Biomedical Genetics</strong></p><br>
+            <p style='text-align:center;'><strong>College of Engineering & School of Medicine, Boston University</strong></p>
+        </div>
+
+        </section>
+
+        <section id='headinfo' class='hide'>
+            <h1 id='input_value' style='font-size:40px'>Test</h1>
+            <h1 id='external_ref' style='font-size:20px'>External references</h1>
+            <center><u><a id='ncbiREF' style='color:black'>NCBI</a></u>&nbsp;&nbsp;&nbsp;
+            <u><a id='ensemblREF' style='color:black;display:inline'>Ensembl</a></u>&nbsp;&nbsp;&nbsp;
+            <u><a id='gcatREF' style='color:black;display:inline'>GWAS catalog</a></u>&nbsp;&nbsp;&nbsp;
+            <u><a id='gnomadREF' style='color:black;display:inline'>Gnomad</a></u></center>            
+        </section>
+
+        <br><br>
+        
+        <section class='hide' id='plotsection'>
+            <h1>Genome Structure</h1>
+            <div style='text-align:center'>
+               <figure class="loader"></figure>
+            </div>
+            <div>
+               <center><img id="plotgene" alt='Genome browser' width='80%' height='80%'/></center>
+            </div>
+            <br><br>
+            <h1 id='isoplot_header'>Isoform Structure</h1>
+            <div style='text-align:center'>
+               <figure class="loader"></figure>
+            </div>
+            <div>
+               <center><img id="plotiso" alt='Isoform browser' width='80%' height='80%'/></center>
+            </div>
+         </section>
+         
+        <br><br>
+        <h1 id='gene_header' hidden>Gene Information</h1>
+        <!--h4 class="hide" id='genedownload'>Download</h4-->
+        <table style='padding:0 100px;' id='genetable' class='tablesorter'></table>
+        <br><br>
+        
+        <section id = "middle" class="hide">
+            <div id="table_1" class='table'>
+                <!--h1>Gene Information</h1>
+                <h4 class="hide" id='genedownload'>Download</h4>
+                <table id='genetable' class='tablesorter'></table--> 
+                <h1 id="isoinfo_header">Isoform Information</h1>     
+                <h4 class="hide" id='isodownload'>Download</h4>
+                <p style='color:black;display:inline' id="btn0"></p>
+                <!--input id="pageSize" type="text" size="1" maxlength="2" value="getDefaultValue()"/>
+                <p style='color:black;display:inline'>records</p> 
+                <u><a style='color:black;display:inline' href="#soinfo_header" id="pageSizeSet">Set</a></u-->
+                <p style='color:black;display:inline' id="sjzl"></p>&nbsp;&nbsp;&nbsp;&nbsp;
+                <br>
+                <u><a style='color:black;cursor:pointer;' id="btn1">First</a></u>
+                <u><a style='color:black;cursor:pointer;' id="btn2">Previous</a></u>
+                <u><a style='color:black;cursor:pointer;' id="btn3">Next</a></u>
+                <u><a style='color:black;cursor:pointer;' id="btn4">Last</a></u>&nbsp;&nbsp;&nbsp;&nbsp;
+                <p style='color:black;display:inline'>Jump to&nbsp;</p>
+                <input style='display:inline' id="changePage" type="text" size="1" maxlength="4"/>
+                <p style='color:black;display:inline'>Page&nbsp;</p>
+                <u><a style='color:black;display:inline' href="#isoinfo_header" id="btn5">Jump to</a></u>
+                <table id="isotable" class='tablesorter'>
+                </table>
+            </div>
+
+            <div id="table2" class='table'>
+                <h1>SNP Information</h1> <br>
+                <!--input hidden type="radio" id='hidesnp' name="EGsnp" value="hidesnp"> 
+                <p id='hidetxt' style='display:inline'>Hide SNPs</p-->
+                <input hidden type="radio" id='exomes' name="EGsnp" value="Exomes" /> 
+                <p id='extxt' style='display:inline'>Exomes</p>
+                <input hidden type="radio" id='genomes' name="EGsnp" value="Genomes" />
+                <p id='getxt' style='display:inline'>Genomes </p><br>
+                <div hidden id="exomeSNP_part">
+                    <h1 id='exome_header'>Exome SNP Information</h1>
+                    <h4 class="hide" id='snpdownload'>Download</h4>
+                    <div id="epage_part">
+                        <p style='color:black;display:inline' id="btn0_esnp"></p>
+                        <!--input id="pageSize" type="text" size="1" maxlength="2" value="getDefaultValue()"/>
+                        <p style='color:black;display:inline'>records</p> 
+                        <u><a style='color:black;display:inline' href="#soinfo_header" id="pageSizeSet">Set</a></u-->
+                        <p style='color:black;display:inline' id="sjzl_esnp"></p>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <br>
+                        <u><a style='color:black;cursor:pointer;' id="btn1_esnp">First</a></u>
+                        <u><a style='color:black;cursor:pointer;' id="btn2_esnp">Previous</a></u>
+                        <u><a style='color:black;cursor:pointer;' id="btn3_esnp">Next</a></u>
+                        <u><a style='color:black;cursor:pointer;' id="btn4_esnp">Last</a></u>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <p id='ejumpt' style='color:black;display:inline'>Jump to&nbsp;</p>
+                        <input style='display:inline' id="changePage_esnp" type="text" size="1" maxlength="4"/>
+                        <p id='epaget' style='color:black;display:inline'>Page&nbsp;</p>
+                        <u><a style='color:black;display:inline' href="#isoinfo_header" id="btn5_esnp">Jump to</a></u>
+                    </div>
+                    <table id="snptable" class="tablesorter"></table><br>
+                </div>
+                
+                <div hidden id="genomeSNP_part">
+                    <h1 id='genome_header'>Genome SNP Information</h1>
+                    <h4 class="hide" id='gsnpdownload'>Download</h4>
+                    <p style='color:black;display:inline' id="btn0_gsnp"></p>
+                    <!--input id="pageSize" type="text" size="1" maxlength="2" value="getDefaultValue()"/>
+                    <p style='color:black;display:inline'>records</p> 
+                    <u><a style='color:black;display:inline' href="#soinfo_header" id="pageSizeSet">Set</a></u-->
+                    <p style='color:black;display:inline' id="sjzl_gsnp"></p>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <br>
+                    <u><a style='color:black;cursor:pointer;' id="btn1_gsnp">First</a></u>
+                    <u><a style='color:black;cursor:pointer;' id="btn2_gsnp">Previous</a></u>
+                    <u><a style='color:black;cursor:pointer;' id="btn3_gsnp">Next</a></u>
+                    <u><a style='color:black;cursor:pointer;' id="btn4_gsnp">Last</a></u>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <p id='gjumpt' style='color:black;display:inline'>Jump to&nbsp;</p>
+                    <input style='display:inline' id="changePage_gsnp" type="text" size="1" maxlength="4"/>
+                    <p id='gpaget' style='color:black;display:inline'>Page&nbsp;</p>
+                    <u><a style='color:black;display:inline' href="#isoinfo_header" id="btn5_gsnp">Jump to</a></u>       
+                    <table id="gsnptable" class="tablesorter"></table>
+                </div>
+                <h1 hidden id='coordinate_header'>SNP 3D Coordinate</h1>
+                <table hidden id="prosnptable" class="tablesorter"></table>
+            </div>
+        </section>
+
+        <section id='bottom' class="hide">
+            <div id='table3' class='table'>
+                <h1 id='gwas_header'>GWAS catalog </h1>
+                <h4 class="hide" id='GWASdownload'>Download</h4>
+                <table id="GWAStable" class='tablesorter'>
+                </table>
+            </div>
+            <div id='table4' class='table'>
+                <!--h1>SIFT and Polyphen (Variant Effect Predictor)</h1>
+                <h4 class="hide" id='VEPdownload'>Download</h4>
+                <table id='VEPtable' class='tablesorter'>
+                </table-->
+                <h1>Exome SNPs Poplulation Frequency</h1>
+                <h4 class="hide" id='Popdownload'>Download</h4>
+                <table id='Poptable' class='tablesorter'></table>
+                <h1>Genome SNPs Poplulation Frequency</h1>
+                <h4 class="hide" id='GPopdownload'>Download</h4>
+                <table id='GPoptable' class='tablesorter'></table>
+            </div>
+        </section>
+        
+        <br><br>
+        
+        <section hidden id='vep_part'>
+            <h1 id='vep_anno_header'>SIFT and Polyphen Prediction</h1>
+            <center><div style="width:1300px;overflow-y:auto;max-height:600px;" hidden id='vep_anno'>
+                <h4 id='vep_anno_download'>Download</h4>
+                <!--p style='color:black;display:inline' id='btn0_vep'></p>
+                <p style='color:black;display:inline'>records</p> 
+                <p style='color:black;display:inline' id='sjzl_vep'></p>&nbsp;&nbsp;&nbsp;&nbsp;
+                <u><a style='color:black;cursor:pointer;' id='btn1_vep'>First</a></u>
+                <u><a style='color:black;cursor:pointer;' id='btn2_vep'>Previous</a></u>
+                <u><a style='color:black;cursor:pointer;' id='btn3_vep'>Next</a></u>
+                <u><a style='color:black;cursor:pointer;' id='btn4_vep'>Last</a></u>&nbsp;&nbsp;&nbsp;&nbsp;
+                <p id='vep_jumpt' style='color:black;display:inline'>Jump to&nbsp;</p>
+                <input style='display:inline' id='changePage_vep' type='text' size='1' maxlength='4'/>
+                <p id='vep_paget' style='color:black;display:inline'>Page&nbsp;</p>
+                <u><a style='color:black;display:inline' href='#vep_anno_header' id='btn5_vep'>Jump to</a></u-->       
+            <table id='vep_anno_table' class='tablesorter'></table>
+            </div></center>
+        </section>        
+
+        <!-- choose a theme file -->
+        <link rel="stylesheet" href="css/theme.blue.css">
+        <link rel="stylesheet" href="webpage.css">
+        <link rel="stylesheet" href="bluetable.css">
+        
+        <!-- load jQuery and tablesorter scripts -->
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <!--script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script-->
+        <script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="table2csv.js"></script> 
+        <!--script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script-->
+        <link rel="icon" href="data:;base64,=">
+        <!--<script type="text/javascript" src="jquery.tablesorter.widgets.js"></script>-->
+
+        <script>                      
+        $(function(){
+            //fill the dropdown content in chr
+            for (i = 1; i<23; i++) {
+                 $("#Chr").append("<option value="+i+">"+i+"</option>");
+                 };
+            $("#Chr").append("<option value='X'> X </option>");
+            $("#Chr").append("<option value='Y'> Y </option>");
+            if ($(location).attr('href')!="http://localhost:8080/webpage_v1.html"){
+            url = window.location.href;
+            url = url.split('?')[1];
+            searchentry = url.split('=')[0];
+            if (searchentry=='symbol'){Checkgene();}
+            if (searchentry=='Chr'){Checkrange();}
+            if (searchentry=="SNP"){Checksnp();}
+            }
+
+            //$('#gene-panel').on('submit',function(event) {
+		//event.preventDefault();
+                //Checkgene();
+                //Plot1();	   
+                //Searchgene();
+                //SearchENST();
+                //SearchSNP();
+                //SearchGWAS();
+                //$("#Poptable").empty();
+                //$("#VEPtable").empty();
+            //});
+
+            $("#Chr").on('change',function(){
+               SelectChr();
+            });
+           
+            //$("#range-panel").on('submit',function(event){
+                //event.preventDefault();
+                //Checkrange();
+            //});
+
+            //$('#snp-panel').on('submit',function(event) {
+                //event.preventDefault();
+                //Checksnp();
+                //SearchVEP();
+                //Searchpop();
+            //});
+
+            //$('#hidesnp').on('click',function(event){
+            //    $('#exome_header').hide();
+            //    $('#genome_header').hide();
+            //    $('#snpdownload').hide();
+            //    $('#gsnpdownload').hide();
+            //    $('#snptable').hide();
+            //    $('#gsnptable').hide();
+            //});
+
+            $('#exomes').on('click',function(event){
+                $('#exomeSNP_part').show();
+                $('#genomeSNP_part').hide();
+                
+            });
+
+            $('#genomes').on('click',function(event){
+                $('#exomeSNP_part').hide();
+                $('#genomeSNP_part').show();
+            });
+
+            $('#PDB-panel').on('submit',function(event) {
+                event.preventDefault();
+                Checkpdb();
+                //SearchVEP();
+                //Searchpop();
+            });
+
+            $('h4').on('click',function(event) {
+                $(event.target).next().table2csv({
+                 	"separator": ",",
+	                "newline": "\n",
+	                "quoteFields": true,
+	                "excludeColumns": "",
+	                "excludeRows": "",
+ 	                "trimContent": true,
+	                "filename": "table.csv",
+                 });
+            });
+
+
+            $("#gene_view").click(function(){
+                var rightnow = new Date();
+                url=$("#plot_gene").attr('src');
+                str='<!DOCTYPE html><html><head><title>Genome Browser</title></head><body><img src="'+url+'?'+rightnow.getTime()+'" width=100% height=100% /></body></html>';
+                var a=window.open("")
+                a.document.write(str);
+            });
+            $("#isoform_view").click(function(){
+                var rightnow = new Date();
+                url=$("#plot_iso").attr('src');
+                str='<!DOCTYPE html><html><head><title>Isoform Browser</title></head><body><img src="'+url+'?'+rightnow.getTime()+'" width=100% height=100% /></body></html>';
+                var a=window.open("")
+                a.document.write(str);
+            });
+
+            function Checkgene(){
+                //symbol = $('#symbol').val();
+                //ENSG = $('#ENSG').val();
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                ENSG = ENSG.split('#')[0];
+                //alert(symbol);
+                //alert(ENSG);
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchgene.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: successGene
+                });           
+            };
+            function successGene(returnData) {
+                // the main process have to be here<br>
+                var result = !$.trim(returnData);
+                $old_url = $(this).attr('href');
+                if (result) {
+                    alert('The gene you input is not found!')
+                 }
+                else {
+                    //old_url = window.location.href;
+                    //new_url = old_url+"?symbol="+symbol+"&"+"ENSG="+ENSG;
+                    //window.location.href = new_url;
+                    //$(this).attr('href',new_url);
+                    //$("#top").attr('class','show');
+                    url = window.location.href;
+                    entries = url.split('?')[1];
+                    symbol = entries.split('=')[1];
+                    symbol = symbol.split('&')[0].toUpperCase();
+                    ENSG = entries.split('=')[2].toUpperCase();
+                    if (symbol) {
+                        $("#input_value").text(symbol);
+                        $("#ncbiREF").attr('href','https://www.ncbi.nlm.nih.gov/gene/?term='+symbol);
+                        $("#ensemblREF").attr('href','https://grch37.ensembl.org/Homo_sapiens/Gene/Summary?g='+symbol);           
+                        $("#gcatREF").attr('href','https://www.ebi.ac.uk/gwas/genes/'+symbol);
+                        $("#gnomadREF").attr('href','https://gnomad.broadinstitute.org/gene/'+symbol+'?dataset=gnomad_r2_1');
+                    } else {
+                        $("#input_value").text(ENSG);
+                        $("#ncbiREF").attr('href','https://www.ncbi.nlm.nih.gov/gene/?term='+ENSG);
+                        $("#ensemblREF").attr('href','https://grch37.ensembl.org/Homo_sapiens/Gene/Summary?g='+ENSG);
+                        $("#gnomadREF").attr('href','https://gnomad.broadinstitute.org/gene/'+ENSG+'?dataset=gnomad_r2_1');
+                    }    
+                    $("#headinfo").attr('class','show');
+                    $("#middle").attr('class','show');
+                    $("#bottom").attr('class','show');
+                    $("#plotsection").attr('class','show');
+                    $("#homepage").attr('class','hide');
+                    $("#gene_header").show();
+                    Plot1();
+                    Searchgene();
+                    SearchENST();
+                    SearchSNP();
+                    SearchGWAS();
+                    $("#hidesnp").show();
+                    $("#exomes").show();
+                    $("#genomes").show();
+                    $("#Poptable").empty();
+                    //$("#VEPtable").empty();
+                }
+            };
+
+            function SelectChr(){
+                $("#start").attr('value','');
+                $("#end").attr('value','');
+                $("#end").attr('placeholder','');
+                $("#viewrange").attr('class','');
+                Chr = $("#Chr").val();
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/selectchr.py',
+                    type: 'get',
+                    data: {'submit':'submit','Chr':Chr},
+                    success:function(response){
+                        $("#end").attr('placeholder','Max:'+response);
+                    }
+                });
+            };
+
+            function Checkrange(){
+                //$("#start").attr('value','');
+                //$("#end").attr('value','');
+                //$("#end").attr('placeholder','');
+                //$("#viewrange").attr('class','');
+                //Chr = $("#Chr").val();
+                url = window.location.href;
+                entries = url.split('?')[1];
+                Chr = entries.split('=')[1];
+                Chr = Chr.split('&')[0];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/selectchr.py',
+                    type: 'get',
+                    data: {'submit':'submit','Chr':Chr},
+                    success:function(response){			
+                        url = window.location.href;
+                        entries = url.split('?')[1];
+                        Chr = entries.split('=')[1];
+                        Chr = Chr.split('&')[0];
+                        Start = entries.split('=')[2];
+                        Start = Number(Start.split('&')[0]);
+                        End = Number(entries.split('=')[3]);
+                        maxrange = Number(response);
+                        if (Chr !='' && Start>0 && Start<End && End <= maxrange){
+                            $("#plotsection").attr('class','show');
+                            $("#homepage").attr('class','hide');
+                            $("#plotsection div:eq(2)").attr('class','hide');
+                            $("#plotsection div:eq(3)").attr('class','hide');
+                            $("#isoplot_header").hide();
+                            Plotrange();
+                        } else{alert('Please input right range'+' '+Chr+' '+Start+' '+End+' '+maxrange);}
+ 
+                    }
+               });
+            };
+
+            function Plotrange(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                Chr = entries.split('=')[1];
+                Chr = Chr.split('&')[0];
+                Start = entries.split('=')[2];
+                Start = Start.split('&')[0];
+                End = entries.split('=')[3];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/range_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','Chr':Chr,'Start':Start,"End":End},
+                    success: function(response){
+                        $("#gene_header").hide();
+                        $("#plotsection div:eq(0)").attr('class','hide');
+                        $("#plotsection div:eq(1)").attr('class','show');
+                        var rightnow = new Date();
+                        var rs=response.trim();
+                        $("#plotgene").attr('src','http://localhost:8080/Range_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        plot_file1 = '/restricted/projectnb/casa/_jychung/_gene2protein/web/htdocs/Range_Browser1_'+rs+'.png'
+                        $.ajax({
+                            url: 'http://localhost:8080/cgi-bin/Delete_IsoPlot.py',
+                            type: 'get',
+                            data: {'submit':'submit','plot_file1':plot_file1},
+                            success: function(response){
+                                temp = response.trim();
+                            }
+                        });
+                    }
+                });
+            };
+
+            function Checksnp(){
+                //SNP = $('#SNP').val();
+                //base = $('#base').val();
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/checksnp.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP,'base':base},
+                    success: successSNP
+                });
+            };
+
+            function successSNP(returnData) {            
+                var result = !$.trim(returnData);
+                if (result) {
+                   alert('The snp you input is not found!')
+                 }
+                else {
+                    url = window.location.href;
+                    entries = url.split('?')[1];
+                    SNP = entries.split('=')[1];
+                    SNP = SNP.split('&')[0].toLowerCase();
+                    $("#input_value").text(SNP);
+                    $("#ncbiREF").attr('href','https://www.ncbi.nlm.nih.gov/snp/'+SNP);
+                    $("#ensemblREF").attr('href','http://grch37.ensembl.org/Homo_sapiens/Variation/Explore?v='+SNP);
+                    $("#gcatREF").attr('href','https://www.ebi.ac.uk/gwas/variants/'+SNP);
+                    //$("#gnomadREF").attr('href','https://gnomad.broadinstitute.org');
+                    $("#headinfo").attr('class','show');
+                    //$("#top").attr('class','show');
+                    $("#middle").attr('class','show');
+                    $("#bottom").attr('class','show');
+                    $("#plotsection").attr('class','show');
+                    $("#homepage").attr('class','hide');
+                    $("#gene_header").show();
+                    Plot2();
+                    SearchSNPReturnRest();
+                    SearchVEP();
+                    Searchpop();
+                    }
+            }
+
+            function Checkpdb(){
+                PDB = $('#PDB').val();
+         
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/checkpdb.py',
+                    type: 'get',
+                    data: {'submit':'submit', 'PDB':PDB},
+                    success: successPDB
+                });
+            };
+            function successPDB(returnData) {
+                var result = !$.trim(returnData);
+                if (result) {
+                   alert('The PDB_ID you input is not found!')
+                 }
+                else {
+                   //SearchProtein();
+                   SendtoProtein();
+                   }
+            }
+
+
+ 
+            function Plot1(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/gene_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response){
+                        $("#plotsection div:eq(0)").attr('class','hide');
+                        $("#plotsection div:eq(2)").attr('class','hide');
+                        var rightnow = new Date();
+                        var rs=response.trim();
+                        //alert(rs);
+                        //$("#plot_gene").attr('src','http://localhost:8080/Gene_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        //$("#plot_iso").attr('src','http://localhost:8080/Gene_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotgene").attr('src','http://localhost:8080/Gene_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotiso").attr('src','http://localhost:8080/Gene_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotsection div:eq(1)").attr('class',''); 
+                        $("#plotsection div:eq(3)").attr('class',''); 
+                        plot_file1 = '/restricted/projectnb/casa/_jychung/_gene2protein/web/htdocs/Gene_Browser1_'+rs+'.png'
+                        plot_file2 = '/restricted/projectnb/casa/_jychung/_gene2protein/web/htdocs/Gene_Browser2_'+rs+'.png'
+                        $.ajax({
+                            url: 'http://localhost:8080/cgi-bin/Delete_Plot.py',
+                            type: 'get',
+                            data: {'submit':'submit','plot_file1':plot_file1,'plot_file2':plot_file2},
+                            success: function(response){
+                                temp = response.trim();
+                            }
+                        });
+                    }
+                });
+                
+            };
+
+
+            function Plot2(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/snp_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP,'base':base},
+                    success: function(response) {
+                        $("#plotsection div:eq(0)").attr('class','hide');
+                        $("#plotsection div:eq(2)").attr('class','hide');
+                        var rs=response.trim();
+                        //alert(rs);
+                        var rightnow = new Date();
+                        $("#plotgene").attr('src','http://localhost:8080/SNP_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotiso").attr('src','http://localhost:8080/SNP_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotsection div:eq(1)").attr('class','');
+                        $("#plotsection div:eq(3)").attr('class','');
+                        plot_file1 = '/restricted/projectnb/casa/_jychung/_gene2protein/web/htdocs/SNP_Browser1_'+rs+'.png'
+                        plot_file2 = '/restricted/projectnb/casa/_jychung/_gene2protein/web/htdocs/SNP_Browser2_'+rs+'.png'
+                        $.ajax({
+                            url: 'http://localhost:8080/cgi-bin/Delete_Plot.py',
+                            type: 'get',
+                            data: {'submit':'submit','plot_file1':plot_file1,'plot_file2':plot_file2},
+                            success: function(response){
+                                temp = response.trim();
+                            }
+                        });
+                    }
+                });
+            };
+
+            function Searchgene(){
+		 
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                ENSG = ENSG.split('#')[0];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchgene.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+			                  var line = response.trim();
+                        var row = line.split("\t");
+                        $('#genetable').empty();
+                        $('#genetable').append("<thead><tr><th> ENSG </th><th> Symbol </th><th> Chr </th><th> Start </th><th> End</th><th>Full Name</th><th>Gene Type</th></tr></thead>");
+                        $('#genetable').append("<tbody><tr><td style='text-decoration:underline;' id='ENSGID' class='ENSG_ID'>"+row[0]+"</td><td style='text-decoration:underline;cursor:pointer;' class='symbol_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr></tbody>");
+                        $("#gcatREF").attr('href','https://www.ebi.ac.uk/gwas/genes/'+row[1]);
+                        $("#genetable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                            });
+                        }
+                        $('#genedownload').attr('class','download');
+                        //$('#genetable').attr('class','');
+                    }
+                });
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_Gene_Return_VEP.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+                        var lines = response.trim().split("\n");
+                        $("#vep_anno_table").empty();       
+                        $("#vep_anno_table").append("<thead><tr><th> SNP </th><th> ENST </th><th> Chr </th><th> REF </th><th> ALT </th><th> Start_at </th><th> End_at </th><th> Consequence </th><th> Sift_Pre </th><th> Sift_Score </th><th> Polyphen_Pre </th><th> Polyphen_Score </th></tr></thead><tbody>");        
+                        lines.forEach(function(value){
+                   	        row = value.split("\t");
+                            $("#vep_anno_table").append("<tr><td style='text-decoration:underline;' class='rs_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td><td>"+row[12]+"</td></tr>");
+                        });
+                        $("#vep_anno_table").append("</tbody>");
+                        $("#vep_anno_table").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                            });
+                        }
+                        $('#vep_anno_download').attr('class','download');
+                        //$('#VEPtable').attr('class','tablesorter');
+                        
+                        /*
+                        var pageSize = 12;
+                        var curPage=0;
+                        var lastPage;
+                        var direct=0;
+                        var len;
+                        var page;
+                        var begin;
+                        var end;
+
+                        $(document).ready(function display(){
+                            len =$("#vep_anno_table tr").length - 1;
+                            page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            // alert("page==="+page);
+                            curPage=1;
+                            displayPage(1);
+
+                            document.getElementById("btn0_vep").innerHTML=curPage + "/" + page + " page"
+                            document.getElementById("sjzl_vep").innerHTML="Total:" + len + " records";
+                            //document.getElementById("pageSize_vep").value = pageSize;
+
+                            $("#btn1_vep").click(function firstPage(){
+                                curPage=1;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn2_vep").click(function frontPage(){
+                                direct=-1;
+                                displayPage();
+                            });
+                            $("#btn3_vep").click(function nextPage(){
+                                direct=1;
+                                displayPage();
+                            });
+                            $("#btn4_vep").click(function lastPage(){
+                                curPage=page;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn5_vep").click(function changePage(){
+                                curPage=document.getElementById("changePage_vep").value * 1;
+                                if (!/^[1-9]\d*$/.test(curPage)) {
+                                    alert("Please input positive integer number");
+                                    return ;
+                                }
+                                if (curPage > page) {
+                                    alert("Too large number");
+                                    return ;
+                                }
+                                direct = 0;
+                                displayPage();
+                            });
+
+
+                            //$("#pageSizeSet").click(function setPageSize(){
+                            //    pageSize = document.getElementById("pageSize").value;
+                            //    if (!/^[1-9]\d*$/.test(pageSize)) {
+                            //        alert("Please input positive integer number");
+                            //        return ;
+                            //    }
+                            //    len =$("#isotable tr").length - 1;
+                            //    page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            //    curPage=1;
+                            //    direct=0;
+                            //    firstPage();
+                            //});
+                        });
+
+                        function displayPage(){
+                            if(curPage <=1 && direct==-1){
+                                direct=0;
+                                alert("This is the first page");
+                                return;
+                            } else if (curPage >= page && direct==1) {
+                                direct=0;
+                                alert("This is the last page");
+                                return ;
+                            }
+
+                            lastPage = curPage;
+
+                            if (len > pageSize) {
+                                curPage = ((curPage + direct + len) % len);
+                            } else {
+                                curPage = 1;
+                            }
+
+                            document.getElementById("btn0_vep").innerHTML=curPage + "/" + page + " page";
+
+                            begin=(curPage-1)*pageSize + 1;
+                            end = begin + 1*pageSize - 1;
+
+                            if(end > len ) end=len;
+                                $("#vep_anno_table tr").hide();
+                                $("#vep_anno_table tr").each(function(i){
+                                if((i>=begin && i<=end) || i==0 )
+                                    $(this).show();
+                                });
+                        }
+                        */
+                        
+                        $('#vep_part').show();
+                        $('#vep_anno').show();
+                        
+                    }
+                });     
+            };
+          
+             
+            function SearchENST(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                ENSG = ENSG.split('#')[0];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchENST.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#isotable').empty();
+                        $("#isotable").append("<thead><tr><th> ENST </th><th> Chr </th><th> Start </th><th> End </th><th> Type </th><th>PDBID</th></tr></thead><tbody>");        
+                        lines.forEach(function(value){
+                        	row = value.split(" ");
+                                $('#isotable').append("<tr><td style='text-decoration:underline;' class='ENST_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td style='text-decoration:underline;cursor:pointer;' class='PDB_ID'>"+row[5]+"</td></tr>");
+                        });
+	                      $("#isotable").append("</tbody>"); 
+                        $("#isotable").tablesorter({theme: 'blue'});
+                        $('#isodownload').attr('class','download');
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                            });
+                        }
+                    
+                        var pageSize = 18;
+                        var curPage=0;
+                        var lastPage;
+                        var direct=0;
+                        var len;
+                        var page;
+                        var begin;
+                        var end;
+
+                        $(document).ready(function display(){
+                            len =$("#isotable tr").length - 1;
+                            page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            // alert("page==="+page);
+                            curPage=1;
+                            displayPage(1);
+
+                            document.getElementById("btn0").innerHTML=curPage + "/" + page + " page"
+                            document.getElementById("sjzl").innerHTML="Total:" + len + " records";
+                            //document.getElementById("pageSize").value = pageSize;
+
+                            $("#btn1").click(function firstPage(){
+                                curPage=1;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn2").click(function frontPage(){
+                                direct=-1;
+                                displayPage();
+                            });
+                            $("#btn3").click(function nextPage(){
+                                direct=1;
+                                displayPage();
+                            });
+                            $("#btn4").click(function lastPage(){
+                                curPage=page;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn5").click(function changePage(){
+                                curPage=document.getElementById("changePage").value * 1;
+                                if (!/^[1-9]\d*$/.test(curPage)) {
+                                    alert("Please input positive integer number");
+                                    return ;
+                                }
+                                if (curPage > page) {
+                                    alert("Too large number");
+                                    return ;
+                                }
+                                direct = 0;
+                                displayPage();
+                            });
+
+
+                            //$("#pageSizeSet").click(function setPageSize(){
+                            //    pageSize = document.getElementById("pageSize").value;
+                            //    if (!/^[1-9]\d*$/.test(pageSize)) {
+                            //        alert("Please input positive integer number");
+                            //        return ;
+                            //    }
+                            //    len =$("#isotable tr").length - 1;
+                            //    page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            //    curPage=1;
+                            //    direct=0;
+                            //    firstPage();
+                            //});
+                        });
+
+                        function displayPage(){
+                            if(curPage <=1 && direct==-1){
+                                direct=0;
+                                alert("This is the first page");
+                                return;
+                            } else if (curPage >= page && direct==1) {
+                                direct=0;
+                                alert("This is the last page");
+                                return ;
+                            }
+
+                            lastPage = curPage;
+
+                            if (len > pageSize) {
+                                curPage = ((curPage + direct + len) % len);
+                            } else {
+                                curPage = 1;
+                            }
+
+                            document.getElementById("btn0").innerHTML=curPage + "/" + page + " page";
+
+                            begin=(curPage-1)*pageSize + 1;
+                            end = begin + 1*pageSize - 1;
+
+                            if(end > len ) end=len;
+                                $("#isotable tr").hide();
+                                $("#isotable tr").each(function(i){
+                                if((i>=begin && i<=end) || i==0 )
+                                    $(this).show();
+                                });
+                        }
+                    }
+                })  
+            };
+
+            
+            function SearchSNP(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                ENSG = ENSG.split('#')[0];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchsnp.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+                        
+                        var lines = response.trim().split('\n');
+                        $('#snptable').empty();
+                        $("#snptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Postion </th><th> REF</th><th> ALT</th><th> variant_type </th><th> allele_type </th></tr></thead><tbody>");        
+                        lines.forEach(function(value){
+                        	row = value.split("\t");
+                                $('#snptable').append("<tr><td style='text-decoration:underline;' class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr>");
+                        });
+                        $("#snptable").append('</tbody>');
+                        //var resort = true,
+                        //callback = function( table ) {
+                        //alert( 'new sort applied' );
+                        //};
+                        //$("#snptable").trigger( 'update', [ resort, callback ] );
+                        $("#snptable").tablesorter({theme: 'blue'}); 
+                        $("#exomeSNP_part").show();
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                        });
+                        }
+                        $('#snpdownload').attr('class','download');
+                        //$('#snptable').attr('class','tablesorter');
+                        
+                        var pageSize = 15;
+                        var curPage=0;
+                        var lastPage;
+                        var direct=0;
+                        var len;
+                        var page;
+                        var begin;
+                        var end;
+
+                        $(document).ready(function display(){
+                            len =$("#snptable tr").length - 1;
+                            page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            // alert("page==="+page);
+                            curPage=1;
+                            displayPage(1);
+
+                            document.getElementById("btn0_esnp").innerHTML=curPage + "/" + page + " page"
+                            document.getElementById("sjzl_esnp").innerHTML="Total:" + len + " records";
+                            //document.getElementById("pageSize").value = pageSize;
+
+                            $("#btn1_esnp").click(function firstPage(){
+                                curPage=1;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn2_esnp").click(function frontPage(){
+                                direct=-1;
+                                displayPage();
+                            });
+                            $("#btn3_esnp").click(function nextPage(){
+                                direct=1;
+                                displayPage();
+                            });
+                            $("#btn4_esnp").click(function lastPage(){
+                                curPage=page;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn5_esnp").click(function changePage(){
+                                curPage=document.getElementById("changePage_esnp").value * 1;
+                                if (!/^[1-9]\d*$/.test(curPage)) {
+                                    alert("Please input positive integer number");
+                                    return ;
+                                }
+                                if (curPage > page) {
+                                    alert("Too large number");
+                                    return ;
+                                }
+                                direct = 0;
+                                displayPage();
+                            });
+
+
+                            //$("#pageSizeSet").click(function setPageSize(){
+                            //    pageSize = document.getElementById("pageSize").value;
+                            //    if (!/^[1-9]\d*$/.test(pageSize)) {
+                            //        alert("Please input positive integer number");
+                            //        return ;
+                            //    }
+                            //    len =$("#isotable tr").length - 1;
+                            //    page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            //    curPage=1;
+                            //    direct=0;
+                            //    firstPage();
+                            //});
+                        });
+
+                        function displayPage(){
+                            if(curPage <=1 && direct==-1){
+                                direct=0;
+                                alert("This is the first page");
+                                return;
+                            } else if (curPage >= page && direct==1) {
+                                direct=0;
+                                alert("This is the last page");
+                                return ;
+                            }
+
+                            lastPage = curPage;
+
+                            if (len > pageSize) {
+                                curPage = ((curPage + direct + len) % len);
+                            } else {
+                                curPage = 1;
+                            }
+
+                            document.getElementById("btn0_esnp").innerHTML=curPage + "/" + page + " page";
+
+                            begin=(curPage-1)*pageSize + 1;
+                            end = begin + 1*pageSize - 1;
+
+                            if(end > len ) end=len;
+                                $("#snptable tr").hide();
+                                $("#snptable tr").each(function(i){
+                                if((i>=begin && i<=end) || i==0 )
+                                    $(this).show();
+                                });
+                        }
+                    }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_Gene_Return_GenomeSNP.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+
+                        var lines = response.trim().split('\n');
+                        $('#gsnptable').empty();
+                        $("#gsnptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Postion </th><th> REF</th><th> ALT</th><th> variant_type </th><th> allele_type </th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                                row = value.split("\t");
+                                $('#gsnptable').append("<tr><td style='text-decoration:underline;' class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr>");
+                        });
+                        $("#gsnptable").append('</tbody>');
+                        //var resort = true,
+                        //callback = function( table ) {
+                        //alert( 'new sort applied' );
+                        //};
+                        //$("#gsnptable").trigger( 'update', [ resort, callback ] );
+                        $("#gsnptable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                            $(this).focus();
+                            });
+                        }
+                        
+                        $('#gsnpdownload').attr('class','download');
+                        //$('#gsnptable').attr('class','tablesorter');
+                        var pageSize = 15;
+                        var curPage=0;
+                        var lastPage;
+                        var direct=0;
+                        var len;
+                        var page;
+                        var begin;
+                        var end;
+
+                        $(document).ready(function display(){
+                            len =$("#gsnptable tr").length - 1;
+                            page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            // alert("page==="+page);
+                            curPage=1;
+                            displayPage(1);
+
+                            document.getElementById("btn0_gsnp").innerHTML=curPage + "/" + page + " page"
+                            document.getElementById("sjzl_gsnp").innerHTML="Total:" + len + " records";
+                            //document.getElementById("pageSize").value = pageSize;
+
+                            $("#btn1_gsnp").click(function firstPage(){
+                                curPage=1;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn2_gsnp").click(function frontPage(){
+                                direct=-1;
+                                displayPage();
+                            });
+                            $("#btn3_gsnp").click(function nextPage(){
+                                direct=1;
+                                displayPage();
+                            });
+                            $("#btn4_gsnp").click(function lastPage(){
+                                curPage=page;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn5_gsnp").click(function changePage(){
+                                curPage=document.getElementById("changePage_gsnp").value * 1;
+                                if (!/^[1-9]\d*$/.test(curPage)) {
+                                    alert("Please input positive integer number");
+                                    return ;
+                                }
+                                if (curPage > page) {
+                                    alert("Too large number");
+                                    return ;
+                                }
+                                direct = 0;
+                                displayPage();
+                            });
+
+
+                            //$("#pageSizeSet").click(function setPageSize(){
+                            //    pageSize = document.getElementById("pageSize").value;
+                            //    if (!/^[1-9]\d*$/.test(pageSize)) {
+                            //        alert("Please input positive integer number");
+                            //        return ;
+                            //    }
+                            //    len =$("#isotable tr").length - 1;
+                            //    page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            //    curPage=1;
+                            //    direct=0;
+                            //    firstPage();
+                            //});
+                        });
+
+                        function displayPage(){
+                            if(curPage <=1 && direct==-1){
+                                direct=0;
+                                alert("This is the first page");
+                                return;
+                            } else if (curPage >= page && direct==1) {
+                                direct=0;
+                                alert("This is the last page");
+                                return ;
+                            }
+
+                            lastPage = curPage;
+
+                            if (len > pageSize) {
+                                curPage = ((curPage + direct + len) % len);
+                            } else {
+                                curPage = 1;
+                            }
+
+                            document.getElementById("btn0_gsnp").innerHTML=curPage + "/" + page + " page";
+
+                            begin=(curPage-1)*pageSize + 1;
+                            end = begin + 1*pageSize - 1;
+
+                            if(end > len ) end=len;
+                                $("#gsnptable tr").hide();
+                                $("#gsnptable tr").each(function(i){
+                                if((i>=begin && i<=end) || i==0 )
+                                    $(this).show();
+                                });
+                        }
+                    }
+                }); 
+          }
+
+            function SearchGWAS(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                ENSG = ENSG.split('#')[0];
+                $('#gwas_header').text("GWAS catalog on(closed to) the Gene (+/-25000bp)")
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchgwas.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        //alert(lines);
+                        $('#GWAStable').empty();
+                        $("#GWAStable").append("<thead><tr><th> Chr </th><th> Position </th><th> Trait </th><th> SNP </th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                        	      row = value.split("\t");
+                                //trait = row.slice(2,row.length-1).join(" ");
+                                $('#GWAStable').append("<tr><td>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td style='text-decoration:underline;cursor:pointer;' class='gwas_snp'>"+row[3]+"</td></tr>");
+                            });
+                        }
+                        $("#GWAStable").append("</tbody>");
+                        $("#GWAStable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#GWASdownload').attr('class','download');
+                        //$('#GWAStable').attr('class','tablesorter');
+                    }
+                });
+            };
+
+            
+            function SearchSNPReturnRest(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_GWAScatalog.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#GWAStable').empty();
+                        $("#GWAStable").append("<thead><tr><th> Chr </th><th> Position </th><th> Trait </th><th> SNP </th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                                row = value.split("\t");
+                                //trait = row.slice(2,row.length-1).join(" ");
+                                $('#GWAStable').append("<tr><td>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td style='text-decoration:underline;cursor:pointer;' class='gwas_snp'>"+row[3]+"</td></tr>");
+                            });
+                        };
+                        $("#GWAStable").append("</tbody>");
+                        $("#GWAStable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        $('#GWASdownload').attr('class','download');
+                        //$('#GWAStable').attr('class','tablesorter');
+                  }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_Geneinfo.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#genetable').empty();
+                        $('#genetable').append("<thead><tr><th> ENSG </th><th> Symbol </th><th> Chr </th><th> Start </th><th> End</th><th>Full Name</th><th>Gene Type</th></tr></thead>");
+                        lines.forEach(function(value){
+                            row = value.split("\t");
+                            $('#genetable').append("<tbody><tr><td style='text-decoration:underline;' class='ENSG_ID'>"+row[0]+"</td><td style='text-decoration:underline;cursor:pointer;' class='symbol_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr></tbody>");
+                        })
+                        $("#genetable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#genedownload').attr('class','download');
+                        //$('#genetable').attr('class','');
+                    }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_Isoform.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#isotable').empty();
+                        $("#isotable").append("<thead><tr><th> ENST </th><th> Chr </th><th> Start </th><th> End </th><th> Type </th><th>PDBID</th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                                row = value.split(" ");
+                                $('#isotable').append("<tr><td style='text-decoration:underline;' class='ENST_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td style='text-decoration:underline;cursor:pointer;' class='PDB_ID'>"+row[5]+"</td></tr>");
+                        });
+                        $("#isotable").append("</tbody>");
+                        $("#isotable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#isodownload').attr('class','download');
+                        //$('#isotable').attr('class','tablesorter');
+                        
+                        var pageSize = 18;
+                        var curPage=0;
+                        var lastPage;
+                        var direct=0;
+                        var len;
+                        var page;
+                        var begin;
+                        var end;
+
+                        $(document).ready(function display(){
+                            len =$("#isotable tr").length - 1;
+                            page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            // alert("page==="+page);
+                            curPage=1;
+                            displayPage(1);
+
+                            document.getElementById("btn0").innerHTML=curPage + "/" + page + " page"
+                            document.getElementById("sjzl").innerHTML="Total:" + len + " records";
+                            //document.getElementById("pageSize").value = pageSize;
+
+                            $("#btn1").click(function firstPage(){
+                                curPage=1;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn2").click(function frontPage(){
+                                direct=-1;
+                                displayPage();
+                            });
+                            $("#btn3").click(function nextPage(){
+                                direct=1;
+                                displayPage();
+                            });
+                            $("#btn4").click(function lastPage(){
+                                curPage=page;
+                                direct = 0;
+                                displayPage();
+                            });
+                            $("#btn5").click(function changePage(){
+                                curPage=document.getElementById("changePage").value * 1;
+                                if (!/^[1-9]\d*$/.test(curPage)) {
+                                    alert("Please input positive integer number");
+                                    return ;
+                                }
+                                if (curPage > page) {
+                                    alert("Too large number");
+                                    return ;
+                                }
+                                direct = 0;
+                                displayPage();
+                            });
+
+
+                            //$("#pageSizeSet").click(function setPageSize(){
+                            //    pageSize = document.getElementById("pageSize").value;
+                            //    if (!/^[1-9]\d*$/.test(pageSize)) {
+                            //        alert("Please input positive integer number");
+                            //        return ;
+                            //    }
+                            //    len =$("#isotable tr").length - 1;
+                            //    page=len % pageSize==0 ? len/pageSize : Math.floor(len/pageSize)+1;
+                            //    curPage=1;
+                            //    direct=0;
+                            //    firstPage();
+                            //});
+                        });
+
+                        function displayPage(){
+                            if(curPage <=1 && direct==-1){
+                                direct=0;
+                                alert("This is the first page");
+                                return;
+                            } else if (curPage >= page && direct==1) {
+                                direct=0;
+                                alert("This is the last page");
+                                return ;
+                            }
+
+                            lastPage = curPage;
+
+                            if (len > pageSize) {
+                                curPage = ((curPage + direct + len) % len);
+                            } else {
+                                curPage = 1;
+                            }
+
+                            document.getElementById("btn0").innerHTML=curPage + "/" + page + " page";
+
+                            begin=(curPage-1)*pageSize + 1;
+                            end = begin + 1*pageSize - 1;
+
+                            if(end > len ) end=len;
+                                $("#isotable tr").hide();
+                                $("#isotable tr").each(function(i){
+                                if((i>=begin && i<=end) || i==0 )
+                                    $(this).show();
+                                });
+                        }
+                    }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_Snpinfo.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#snptable').empty();
+                        $("#snptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Postion </th><th> REF</th><th> ALT</th><th> variant_type </th><th> allele_type </th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                                row = value.split("\t");
+                                $('#gnomadREF').attr('href','https://gnomad.broadinstitute.org/variant/'+row[1]+'-'+row[2]+'-'+row[3]+'-'+row[4]+'?dataset=gnomad_r2_1');
+                                $('#snptable').append("<tr><td style='text-decoration:underline;' class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr>");
+                            });
+                        };
+                        $("#snptable").append('</tbody>');
+                        //var resort = true,
+                        //callback = function( table ) {
+                        //alert( 'new sort applied' );
+                        //};
+                        //$("#snptable").trigger( 'update', [ resort, callback ] );
+                        $("#exomeSNP_part").show();
+                        $("#epage_part").hide();
+                        $("#exome_header").hide();
+                        $("#snptable").tablesorter({theme: 'blue'});
+                        $("#hidetxt").attr("style","display:none");
+                        $("#extxt").attr("style","display:none");
+                        $("#getxt").attr("style","display:none");
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        //$('#snpdownload').attr('class','download');
+                        //$('#snptable').attr('class','tablesorter');
+                    }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_Protein.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        $("#coordinate_header").show();
+                        var lines = response.trim().split('\n');
+                        $('#prosnptable').empty();
+                        $("#prosnptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Position </th><th> Chain_number</th><th> AA_number</th><th>PDBID</th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                                row = value.split("\t");
+                                $('#prosnptable').append("<tr><td style='text-decoration:underline;' class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td style='text-decoration:underline;cursor:pointer;' class='PDB_ID'>"+row[5]+"</td></tr>");
+                            });
+                        }
+                        $("#prosnptable").append('</tbody>');
+                        $("#prosnptable").tablesorter({theme: 'blue'});
+                        $("#prosnptable").show();
+                        $("#hidetxt").attr("style","display:none");
+                        $("#extxt").attr("style","display:none");
+                        $("#getxt").attr("style","display:none");
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#prosnpdownload').attr('class','download');
+                        //$('#snptable').attr('class','tablesorter');
+                  }
+                });
+
+            }
+
+            function SearchVEP(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchvep.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        //$('#VEPtable').empty();
+                        $('#vep_anno_table').empty();
+                        //$("#VEPtable").append("<thead><tr><th> SNP </th><th> ENST </th><th> Chr </th><th> REF </th><th> ALT </th><th> Start_at </th><th> End_at </th><th> Consequence </th><th> Sift_Pre </th><th> Sift_Score </th><th> Polyphen_Pre </th><th> Polyphen_Score </th></tr></thead><tbody>"); 
+                        $("#vep_anno_table").append("<thead><tr><th> SNP </th><th> ENST </th><th> Chr </th><th> REF </th><th> ALT </th><th> Start_at </th><th> End_at </th><th> Consequence </th><th> Sift_Pre </th><th> Sift_Score </th><th> Polyphen_Pre </th><th> Polyphen_Score </th></tr></thead><tbody>");       
+                        if (!$.trim(response)){
+                            response.trim()
+                            //alert("No information for VEP data")
+                        } else {
+                            lines.forEach(function(value){
+                        	      row = value.split("\t");
+                                //$('#VEPtable').append("<tr><td style='text-decoration:underline;' class='VEP_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td><td>"+row[12]+"</td></tr>");
+                                $('#vep_anno_table').append("<tr><td style='text-decoration:underline;cursor:pointer;' class='VEP_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td><td>"+row[12]+"</td></tr>");
+                        });
+                        }
+                        //$("#VEPtable").append("</tbody>");
+                        $("#vep_anno_table").append("</tbody>");
+                        //$("#VEPtable").tablesorter({theme: 'blue'});
+                        $("#vep_anno_table").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#VEPdownload').attr('class','download');
+                        $('#vep_anno_download').attr('class','download');
+                        $('#vep_part').show();
+                        $('#vep_anno').show();
+                        //$('#VEPtable').attr('class','tablesorter');
+                    }
+                });
+            };
+       
+
+            function Searchpop(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchpop.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#Poptable').empty();
+                        $("#Poptable").append("<thead><tr><th>SNP</th><th>REF</th><th>ALT</th><th>Population</th><th>Allele count</th><th>Allele Number</th><th>Allele Frequency</th><th>Number of Homozygotes</th></tr></thead><tbody>");        
+                        if (!$.trim(response)){
+                            response.trim()
+                            //alert("No information for Population data!")}
+                        } else {
+                        lines.forEach(function(value){
+                        	row = value.split(" ");
+                                $('#Poptable').append("<tr><td style='text-decoration:underline;' class='PF_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Africa</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>South Asia</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Latino</td><td>"+row[12]+"</td><td>"+row[13]+"</td><td>"+row[14]+"</td><td>"+row[15]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>East Asia</td><td>"+row[16]+"</td><td>"+row[17]+"</td><td>"+row[18]+"</td><td>"+row[19]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (non-Finnish)</td><td>"+row[20]+"</td><td>"+row[21]+"</td><td>"+row[22]+"</td><td>"+row[23]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (Finnish)</td><td>"+row[24]+"</td><td>"+row[25]+"</td><td>"+row[26]+"</td><td>"+row[27]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Ashkenazi Jewish</td><td>"+row[28]+"</td><td>"+row[29]+"</td><td>"+row[30]+"</td><td>"+row[31]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Other</td><td>"+row[32]+"</td><td>"+row[33]+"</td><td>"+row[34]+"</td><td>"+row[35]+"</td></tr>");
+                        });}
+                        $("#Poptable").append("</tbody>");
+                        $("#Poptable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#Popdownload').attr('class','download');
+                        //$('#Poptable').attr('class','tablesorter');
+                    }
+                });
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_GenomePF.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#GPoptable').empty();
+                        $("#GPoptable").append("<thead><tr><th>SNP</th><th>REF</th><th>ALT</th><th>Population</th><th>Allele count</th><th>Allele Number</th><th>Allele Frequency</th><th>Number of Homozygotes</th></tr></thead><tbody>");
+                        if (!$.trim(response)){
+                            response.trim()
+                            //alert("No information for Genome Population data!")}
+                        } else {
+                        lines.forEach(function(value){
+                                row = value.split(" ");
+                                $('#GPoptable').append("<tr><td style='text-decoration:underline;' class='PF_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Africa</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>South Asia</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Latino</td><td>"+row[12]+"</td><td>"+row[13]+"</td><td>"+row[14]+"</td><td>"+row[15]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>East Asia</td><td>"+row[16]+"</td><td>"+row[17]+"</td><td>"+row[18]+"</td><td>"+row[19]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (non-Finnish)</td><td>"+row[20]+"</td><td>"+row[21]+"</td><td>"+row[22]+"</td><td>"+row[23]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (Finnish)</td><td>"+row[24]+"</td><td>"+row[25]+"</td><td>"+row[26]+"</td><td>"+row[27]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Ashkenazi Jewish</td><td>"+row[28]+"</td><td>"+row[29]+"</td><td>"+row[30]+"</td><td>"+row[31]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Other</td><td>"+row[32]+"</td><td>"+row[33]+"</td><td>"+row[34]+"</td><td>"+row[35]+"</td></tr>");
+                        });}
+                        $("#GPoptable").append("</tbody>");
+                        $("#GPoptable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#GPopdownload').attr('class','download');
+                        //$('#Poptable').attr('class','tablesorter');
+                       }
+                    });
+            };
+
+            //$('#snptable').on("click","td.rs_ID",function(){
+            //    $('#snptable td.rs_ID').css({"fontWeight":"normal"})
+            //    var SNP=$(this).html();
+            //    $(this).css({"fontWeight":"bold"});
+                //$('input[name="SNP"]').val(SNP);
+                //$('#snp-panel').submit();
+            //     $.ajax({
+            //        url: 'http://localhost:8080/cgi-bin/new_searchvep.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','SNP':SNP},
+            //        success: function(response) {
+                        //$("#top div:eq(0)").attr('class','');
+                        //$("#top div:eq(1)").attr('class','');
+                        //$("#top div:eq(2)").attr('class','hide');
+                        //$("#top div:eq(3)").attr('class','hide');
+            //            var lines = response.trim().split('\n');
+            //            $('#VEPtable').empty();
+
+            //            $("#VEPtable").append("<thead><tr><th> SNP </th><th> ENST </th><th> Chr </th><th> REF </th><th> ALT </th><th> Start_at </th><th> End_at </th><th> Consequence </th><th> Sift_Pre </th><th> Sift_Score </th><th> Polyphen_Pre </th><th> Polyphen_Score </th></tr></thead><tbody>");
+            //            if (!$.trim(response)){
+            //            alert("No information for VEP data")}
+            //            else{
+            //            lines.forEach(function(value){
+            //                    row = value.split("\t");
+            //                    $('#VEPtable').append("<tr><td style='text-decoration:underline;' class='VEP_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td><td>"+row[12]+"</td></tr>");
+            //            });}
+            //            $("#VEPtable").append("</tbody>");
+            //            $("#VEPtable").tablesorter({theme: 'blue'});
+//  if ( $('.focus-highlight').length ) {
+//    $('.focus-highlight').find('td, th')
+//      .attr('tabindex', '1')
+      // add touch device support
+//      .on('touchstart', function() {
+//        $(this).focus();
+//      });
+//  }
+
+            //            $('#VEPdownload').attr('class','download');
+            //            //$('#VEPtable').attr('class','tablesorter');
+            //        }
+            //    });
+            //    $.ajax({
+            //        url: 'http://localhost:8080/cgi-bin/new_searchpop.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','SNP':SNP},
+            //        success: function(response) {
+            //            var lines = response.trim().split('\n');
+            //            $('#Poptable').empty();
+            //            $("#Poptable").append("<thead><tr><th>SNP</th><th>REF</th><th>ALT</th><th>Population</th><th>Allele count</th><th>Allele Number</th><th>Allele Frequency</th><th>Number of Homozygotes</th></tr></head><tbody>");
+            //            if (!$.trim(response)){
+            //                alert("No information for Population data!")}
+            //            else{
+            //            lines.forEach(function(value){
+            //                    row = value.split(" ");
+            //                    $('#Poptable').append("<tr><td style='text-decoration:underline;' class='PF_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Africa</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>South Asia</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Latino</td><td>"+row[12]+"</td><td>"+row[13]+"</td><td>"+row[14]+"</td><td>"+row[15]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>East Asia</td><td>"+row[16]+"</td><td>"+row[17]+"</td><td>"+row[18]+"</td><td>"+row[19]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (non-Finnish)</td><td>"+row[20]+"</td><td>"+row[21]+"</td><td>"+row[22]+"</td><td>"+row[23]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (Finnish)</td><td>"+row[24]+"</td><td>"+row[25]+"</td><td>"+row[26]+"</td><td>"+row[27]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Ashkenazi Jewish</td><td>"+row[28]+"</td><td>"+row[29]+"</td><td>"+row[30]+"</td><td>"+row[31]+"</td></tr>"+
+//"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Other</td><td>"+row[32]+"</td><td>"+row[33]+"</td><td>"+row[34]+"</td><td>"+row[35]+"</td></tr>");
+            //           });}
+            //            $("#Poptable").append("</tbody>");
+            //            $("#Poptable").tablesorter({theme: 'blue'});
+//  if ( $('.focus-highlight').length ) {
+//    $('.focus-highlight').find('td, th')
+//      .attr('tabindex', '1')
+      // add touch device support
+//      .on('touchstart', function() {
+//        $(this).focus();
+//      });
+//  }
+            //            $('#Popdownload').attr('class','download');
+            //            //$('#Poptable').attr('class','tablesorter');
+            //        }
+            //    });
+            //    $.ajax({
+            //        url: 'http://localhost:8080/cgi-bin/snp_input_browser.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','SNP':SNP},
+            //        success: function(response) {
+            //            var rightnow = new Date();
+            //            var rs = response.trim()
+            //            $("#plotgene").attr('src','http://localhost:8080/SNP_Browser1_'+rs+'.png?'+rightnow.getTime());
+            //            $("#plotiso").attr('src','http://localhost:8080/SNP_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        //$("#plotsection div:eq(0)").attr('class','hide');
+                        //$("#plotsection div:eq(2)").attr('class','hide');
+                        //$("#plotsection div:eq(1)").attr('class','');
+                        //$("#plotsection div:eq(3)").attr('class','');
+            //        }
+            //    });
+
+                                        
+//            });
+
+            $('#isotable').on("click","td.ENST_ID",function(){
+                $('#isotable td.ENST_ID').css({"fontWeight":"normal"})
+                var ENST=$(this).html();
+                $(this).css({"fontWeight":"bold"});
+                $("#plotsection div:eq(2)").empty();
+                $("#plotsection div:eq(2)").append('<figure class="loader"><figure>')
+                $("#plotsection div:eq(2)").show();
+                $("#plotsection div:eq(3)").hide();
+                $("#isoplot_header").text("Isoform Structure: "+ENST);
+                window.location.hash = "#isoplot_header";
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/isoform_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','ENST':ENST},
+                    success: function(response){
+                        //$("#plotsection div:eq(0)").attr('class','hide');
+                        //$("#plotsection div:eq(2)").attr('class','hide');
+                        //$("#plotsection div:eq(3)").empty();
+                        //$("#plotsection div:eq(3)").append('<figure class="loader"></figure>')
+                        $("#plotsection div:eq(2)").hide();
+                        var rightnow = new Date();
+                        var rs = response.trim();
+                        //alert(rs);
+                        srcurl = 'http://localhost:8080/Isoform_Browser1_'+rs+'.png?'+rightnow.getTime();
+                        $("#plotsection div:eq(3)").empty();
+                        $("#plotsection div:eq(3)").append("<center><img id='plotiso' alt='Isoform browser' width='80%' height='80%'/></img></center>");                        
+                        $("#plotiso").attr('src',srcurl); 
+                        $("#plotsection div:eq(3)").show();
+                        window.location.hash = "#plotiso";
+                        plot_file1 = '/restricted/projectnb/casa/_jychung/_gene2protein/web/htdocs/Isoform_Browser1_'+rs+'.png';
+                        $.ajax({
+                            url: 'http://localhost:8080/cgi-bin/Delete_IsoPlot.py',
+                            type: 'get',
+                            data: {'submit':'submit','plot_file1':plot_file1},
+                            success: function(response){
+                                temp = response.trim();
+                            }
+                        });
+                    }
+                }); 
+                      
+            });
+
+            $('#snptable').on("click","td.rs_ID",function(){
+                $('#snptable td.rs_ID').css({"fontWeight":"normal"});
+                var rightnow = new Date();
+                var SNPval=$(this).html();
+                var URLSNP = 'http://localhost:8080/webpage_v1.html?SNP='+SNPval+'&'+rightnow.getTime();
+                window.open(URLSNP);
+            })   
+            
+            $('#vep_anno_table').on("click","td.rs_ID",function(){
+                $('#vep_anno_table td.rs_ID').css({"fontWeight":"normal"});
+                var rightnow = new Date();
+                var SNPval=$(this).html();
+                var URLSNP = 'http://localhost:8080/webpage_v1.html?SNP='+SNPval+'&'+rightnow.getTime();
+                window.open(URLSNP);
+            })
+            
+            $('#gsnptable').on("click","td.rs_ID",function(){
+                $('#gsnptable td.rs_ID').css({"fontWeight":"normal"});
+                var rightnow = new Date();
+                var SNPval=$(this).html();
+                var URLSNP = 'http://localhost:8080/webpage_v1.html?SNP='+SNPval+'&'+rightnow.getTime();
+                window.open(URLSNP);
+            })  
+  
+            $('#isotable').on("click","td.PDB_ID",function(){
+                $('#isotable td.PDB_ID').css({"fontWeight":"normal"})
+                var rightnow = new Date();
+                var PDBval = $(this).html();
+                var URLPDB = 'http://localhost:8080/protein.html?PDB='+PDBval+'&'+rightnow.getTime();
+                window.open(URLPDB);
+            })
+
+            $('#prosnptable').on("click","td.PDB_ID",function(){
+                $('#prosnptable td.PDB_ID').css({"fontWeight":"normal"})
+                var rightnow = new Date();
+                var PDBval = $(this).html();
+                var URLPDB = 'http://localhost:8080/protein.html?PDB='+PDBval+'&'+rightnow.getTime();
+                window.open(URLPDB);
+            })
+
+            $('#genetable').on("click","td.ENSG_ID",function(){
+                var rightnow = new Date();
+                var ENSGval = $(this).html();
+                var URLGENE = 'http://localhost:8080/webpage_v1.html?symbol=&ENSG='+ENSGval;
+                window.open(URLGENE);
+            })
+           
+            $('#genetable').on("click","td.symbol_ID",function(){
+                var symbolval = $(this).html();
+                var rightnow = new Date();
+                var URLGENE = 'http://localhost:8080/webpage_v1.html?symbol='+symbolval+'&ENSG=';
+                window.open(URLGENE);
+            })
+
+            $('#GWAStable').on("click","td.gwas_snp",function(){
+                var snpval = $(this).html();
+                var URLSNP = 'https://www.ebi.ac.uk/gwas/variants/'+snpval;
+                window.open(URLSNP);
+            })
+
+            $('#VEPtable').on("click","td.VEP_ID",function(){
+                var snpval = $(this).html();
+                var URLSNP = 'https://www.ncbi.nlm.nih.gov/snp/'+snpval;
+                window.open(URLSNP);
+            })
+    
+            $('#Poptable').on("click","td.PF_ID",function(){
+                var snpval = $(this).html();
+                var URLSNP = 'https://www.ncbi.nlm.nih.gov/snp/'+snpval;
+                window.open(URLSNP);
+            })
+
+            //function DownloadCSV(){
+              // console.log($(this).html()); 
+            //};
+
+            //$('#GWAStable').on("click","td.gwas_snp",function(){
+                //$('#snptable td.gwas_snp').css({"fontWeight":"normal"})
+                //var SNP=$(this).html();
+                //$(this).css({"fontWeight":"bold"});
+                //$('input[name="SNP"]').val(SNP);
+               // $('#snp-panel').submit();                        
+            //});
+
+         
+            function SendtoProtein(){
+               PDB = $('#PDB').val();
+               var rightnow = new Date();
+               url = "http://localhost:8080/protein.html?PDB="+PDB+"&"+rightnow.getTime();
+               window.open(url);
+            };
+
+            function SearchProtein(){            
+               PDB = $('#PDB').val();
+               $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_Protein_Return_Gene.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#genetable').empty();
+                        $('#genetable').append("<thead><tr><th> ENSG </th><th> Symbol </th><th> Chr </th><th> Start </th><th> End</th><th>Full Name</th><th>Gene Type</th></tr></thead>");
+                        lines.forEach(function(value){
+                            row = value.split("\t");
+                            $('#genetable').append("<tbody><tr><td style='text-decoration:underline;' class='ENSG_ID'>"+row[0]+"</td><td style='text-decoration:underline;' class='symbol_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr></tbody>");
+                        })
+                        $("#genetable").tablesorter({theme: 'blue'});
+
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#genedownload').attr('class','download');
+                        //$('#genetable').attr('class','');
+                    }
+                });
+            }
+
+            $("#myTable").tablesorter();
+            //$("#snptable").trigger('update');
+            $("#snptable").tablesorter();
+
+
+        });
+
+        
+        </script>
+    </body>
+</html>

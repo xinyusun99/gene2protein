@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Gene2Protein</title>
+           <style>
+body{
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+nav{
+    background-color: black;
+    padding: 3px 0 1px 0;
+    color: white;
+    opacity: 0.8;
+}
+ul{
+    list-style-type: none;
+}
+//li{
+//    display: inline-block;
+//    margin-right: 5px;
+//}
+//li:nth-child(4) {
+//    font-size: 200%;
+//    margin-left: 300px;
+//}
+
+//li:nth-child(5) {
+//    margin-left:300px
+//}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+a:hover{
+    text-decoration: underline;
+}
+
+header, p {
+  margin: 0;
+  padding: 0;
+}
+
+h1.contact {
+    text-align: center;
+    color: blueviolet;
+}
+
+p.contact{
+    text-align: center;
+}
+
+#contact_form {
+    text-align: center;
+}
+
+input.contact {
+    width: 30%;
+    height: 30px;
+    border: none;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+}
+
+textarea.contact_message {
+    overflow-y: auto;
+    width: 30%;
+    height: 100px;
+    text-align: justify;
+    border: none;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+}
+
+#contact_submit {
+    width: 30%;
+    height: 30px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+}
+
+footer {
+padding-top: 60px;
+font-size: 90%;
+}
+
+footer p {
+margin: 0
+}
+section.contact{
+    font-size: 70%;
+    display: flex;
+    flex-direction: row;
+    width: 99%;
+    margin: auto;
+}
+section.contact div{
+    text-align:center;
+}
+section.contact div:nth-child(2){
+    margin-left: 500px;
+}
+</style>
+    </head>
+    
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li style='margin-left:1350px;'><img src='http://localhost:8080/bulogo.png' alt='BU logo' width="85%" height="85%"/></li>
+                    <center><strong style='font-size:30px'>Gene2Protein</strong></center>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_v1.html">Home</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/tutorial.html">Tutorial</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+        <h1 class="contact"> Get in touch </h1>
+        <p class="contact">If you have any question, do not hesitate to <strong>contact us</strong>.</p><br><br>
+        <form id="contact_form">
+            <p class="contact_form">Name: (required)</p>
+            <input id="uname" name="name" type="text" class="contact" placeholder="Please enter your name" required><br><br>
+            <p  class="contact_form">Email: (required)</p>
+            <input id="uemail" name="email" type="text" class="contact" placeholder="Please enter you email" required><br><br>
+            <p class="contcat_form">Message: (required)</p>
+            <textarea id="umessage" name="message" class="contact_message" placeholder="Include all the details you can" required></textarea>
+            <br/>
+            <input type="submit" value="Send" id="contact_submit">
+        </form>
+
+        <footer>
+        <p align='center'>Copyright © , Bioinformatics Program, Biomedical Genetics, Boston University, USA. All Rights Reserved.</p>
+        <p align='center'>Any comments and suggestions, please contact us</p>
+        </footer>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+        <script type="text/javascript">
+        $(document).ready(function(){
+            $('#contact_form').on('submit',function(event){
+                event.preventDefault();
+                SendFeedback(); 
+            });
+        })
+        
+        var SendFeedback = function(){
+                //url = window.location.href;
+                //entries = url.split('?')[1];
+                //name = entries.split('=')[1];
+                //symbol = symbol.split('&')[0];
+                //ENSG = entries.split('=')[2];
+            var name=document.getElementById("uname").value;
+            var email=document.getElementById("uemail").value;
+            var message=document.getElementById("umessage").value;
+            $.ajax({
+              url: 'http://localhost:8080/cgi-bin//contact.py',
+              type: 'get',
+              data: {'submit':'submit','name':name,'email':email,'message':message},
+              success: function(response){
+                   alert('Thank you for your questions and suggestions!');
+              }
+            });
+        }
+        </script>
+    
+    </body>
+</html>
+

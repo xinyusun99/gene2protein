@@ -1,0 +1,31 @@
+ATOM      1  N   TRP A 476      27.874  10.941 -14.855  1.00 24.10           N  
+ATOM      2  N   HIS A 477      26.919  11.956 -11.932  1.00 25.10           N  
+ATOM      3  CA  HIS A 477      27.160  11.696 -10.507  1.00 25.26           C  
+ATOM      4  C   HIS A 477      28.197  10.578 -10.309  1.00 25.31           C  
+ATOM      5  O   HIS A 477      28.013   9.658  -9.507  1.00 27.34           O  
+ATOM      6  N   GLY A 478      29.305  10.663 -11.042  1.00 21.77           N  
+ATOM      7  CA  GLY A 478      30.263   9.578 -11.123  1.00 20.66           C  
+ATOM      8  C   GLY A 478      30.282   8.966 -12.517  1.00 26.65           C  
+ATOM      9  O   GLY A 478      29.938   9.605 -13.509  1.00 25.97           O  
+ATOM     10  N   ASP A 479      30.712   7.703 -12.587  1.00 24.17           N  
+ATOM     11  CA  ASP A 479      30.837   7.015 -13.874  1.00 27.07           C  
+TER      12      ASP A 479 
+HETATM   13  O   HOH A 952      30.125  13.084 -12.553  1.00 35.43           O  
+CONECT    2    3
+CONECT    3    2
+CONECT    3    4
+CONECT    4    3
+CONECT    4    6
+CONECT    4    5
+CONECT    5    4
+CONECT    6    4
+CONECT    6    7
+CONECT    7    6
+CONECT    7    8
+CONECT    8    7
+CONECT    8   10
+CONECT    8    9
+CONECT    9    8
+CONECT   10    8
+CONECT   10   11
+CONECT   11   10

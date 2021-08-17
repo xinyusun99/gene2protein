@@ -1,0 +1,7 @@
+#! /bin/sh
+#
+# Created by configure
+
+"./configure" \
+"--prefix=/restricted/projectnb/casa/_jychung/_gene2protein/web" \
+"$@"

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+     <title>Gene2Protein</title>
+    </head>
+<style>
+.loader {
+  margin: 0 auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loadtext {color:blue}
+</style>
+
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="http://localhost:8080/webpage_v1.html">Home</a></li>
+                    <li><a href="http://localhost:8080/tutorial.html">Tutorial</a></li>
+                    <li><a href="http://localhost:8080/webpage_contact.html">Contact</a></li>
+                    <li><strong>Gene2Protein</strong></li>
+                    <li><img src='http://localhost:8080/bulogo.png' alt='BU logo' width="90px" height="35px"/></li>
+
+                </ul>
+            </nav>
+        </header>
+    
+        <section class = "inputarea">
+            <div class="geneinput">
+                <form id = "gene-panel" action="" method="GET">
+                    Gene Symbol <input type="text" id="symbol" name="symbol" placeholder="e.g., MAPT" size="10" ><br />
+                    ENSG ID&nbsp;<input type="text" id="ENSG" name="ENSG" placeholder="e.g., ENSG00000186868" size="20"><br /> 
+                   <!-- Chr:BP-BP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="Chr" placeholder="e.g., 17: 45894382-46028334" size="25">--><br/>
+                    <input type="submit" id="genesubmit" value="Search Gene">&nbsp;&nbsp;
+                    <input type= "reset" id="genereset" value="Reset">
+                </form>
+            </div>
+
+            <div class="chromosome">
+                <form id = 'range-panel' action="http://localhost:8080/webpage_v1.html" method="GET">
+                    <label for = "Chr">Chromosome</label>
+
+                    <select id = "Chr" name="Chr">
+                        <option value="*">-Select-</option>
+                    </select><br/>
+                    From&nbsp;<input type="text" id="start" name="start" width="15"><br/>
+                    To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="end" name="end" width="15">
+
+                    <input type="submit" id="viewrange" value="View Range" class="hide">
+                </form>
+
+                <!--<form id = "iso-panel">
+                    ENST ID (Isoform) <input type="text" id="ENST" name="ENST" placeholder="e.g., ENST00000446361.3"> <br />
+                    <input type="submit" id="isosubmit" value="Search Isoform">&nbsp;&nbsp;
+                    <input type="reset" id = "isoreset" value="Reset">
+                </form>-->    
+            </div>
+            <div class="snp">
+                <form id = "snp-panel" action="http://localhost:8080/webpage_v1.html" method="GET">
+                    SNP ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="SNP" name="SNP" placeholder="e.g., rs1032974141"><br />
+                    <!--Base Position <input type="text" id="base" name="base" placeholder="e.g., chr17:45894679"><br />-->
+                    <input type="submit" id="snpsubmit" value="Search SNP">&nbsp;&nbsp;
+                    <input type="reset" id = "snpreset"value="Reset">
+                </form>
+            </div>
+            <div class="PDB">
+                <form id = "PDB-panel">
+                    PDBID &nbsp;<input type="text" id ="PDB" name="PDB" placeholder="e.g., 2HEY"><br>
+                    <input type="submit" id="pdbsubmit" name="pdbsubmit" value="View Protein">
+                </form>
+            </div>
+        </section>
+        <section id='homepage'> 
+        <img src="http://localhost:8080/gene_isoform_browser.png" width=20% height=20% style='float:left'></img>
+        <img src="http://localhost:8080/Protein3D_SNP.png" width=15% height=15% style='float:right'></img>
+        <div id='intro' class="introduction" style='margin:0 auto;width:800px;float:center;'>
+            <h2 align='center' style='color:dodgerblue;'>Introduction</h2>
+            <p style='text-align:justify;'><strong>Single-nucleotide polymorphisms (SNPs)</strong> can affect how humans develop diseases, respond to pathogens, chemical drugs and other agents due to the changes in protein structure. However, current software tools limit the connection between SNP genotypes and protein structure data.</p> <br>
+            <p style='text-align:justify;'>In this project, we developed part of the software that links the SNPs to the protein: interactive viewing of the amino acid in 3-dimensional protein structure encoded by a particular SNP and mapping a coding SNP to the corresponding location in a three-dimensional protein structure.</p> <br>
+            <p style='text-align:justify;'>Additionally, we also provide gene and isoform information and structure visualization as well as the SNP annotation collected from GWAS catalog, Gnomad, Variant Effect Predictor and LocusZoom.</p> <br>
+            <p>The reference genome was <strong>GRCH37 (hg19)</strong>. </p><br>
+            <p style='text-align:justify;'>This database allow users to input gene symbol or ENSG (ensembl gene ID), gene coordinate, SNP ID, SNP position and PDBID to obtain information.</p><br>
+            <p style='text-align:justify;'>The project was developed at Boston University as part of BF768, Spring 2020, G. Benson instructor. </p><br>
+            <p style='text-align:center;'><strong>Author: Xudong Han*,Jinghan Huang*,Xinyu Sun*</strong></p><br>
+            <p style='text-align:center;'><strong>Instructor:Dr.Jaeyoon Chung; Dr.Gary Benson</strong></p><br>
+            <p style='text-align:center;'><strong>Department of Bioinformatics & Department of Biomedical Genetics</strong></p><br>
+            <p style='text-align:center;'><strong>College of Engineering & School of Medicine, Boston University</strong></p>
+        </div>
+
+        </section>
+        <section id = "top" class='hide'>
+            <div>
+                <figure class="loader"></figure>
+            </div>
+            <div>
+                <figure class="loader"></figure>
+            </div>
+            <!-- add plot function in plot1 and plot2! -->
+            <div class='hide'>
+            <h1>Genome Structure</h1>
+            <button type="button" style="display:block;margin:0 auto" id='gene_view'>Click to view it in a new window<button><br>
+            <img id="plot_gene" alt='Genome browser' width='1000' height='500'/>
+            <!--<div class="unload"></div>-->
+            </div>        
+            <div class='hide'>
+            <h1>Isoform Structure</h1>
+            <button type="button" style="display:block;margin:0 auto" id='isoform_view'>Click to view it in a new window<button><br>
+            <img id="plot_iso" alt='Genome browser' width='1000' height='500'/>
+            <!--<div class="unload"></div>-->
+            </div>
+        </section>
+
+        <section id = "middle" class="hide">
+            <div id="table_1" class='table'>
+                <h1>Gene Information</h1>
+                <h4 class="hide" id='genedownload'>Download</h4>
+                <table id = 'genetable' class='tablesorter'>
+                </table> 
+                <h1>Isoform Information</h1>     
+                <h4 class="hide" id='isodownload'>Download</h4>
+                <table id="isotable" class='tablesorter'>
+                </table>
+            </div>
+
+            <div id="table2" class='table'>
+                <h1>SNPs on the gene</h1> <br>
+                <input type="radio" id='hidesnp' name="EGsnp" value="hidesnp" /> Hide SNPs
+                <input type="radio" id='exomes' name="EGsnp" value="Exomes" /> Exomes
+                <input type="radio" id='genomes' name="EGsnp" value="Genomes" /> Genomes <br>
+                <h1 hidden id='exome_header'>Exome SNP Information</h1>
+                <h1 hidden id='genome_header'>Genome SNP Information</h1>
+                <h4 hidden class="hide" id='snpdownload'>Download</h4>
+                <h4 hidden class="hide" id='gsnpdownload'>Download</h4>
+                <table hidden id="snptable" class="tablesorter"></table>
+                <table hidden id="gsnptable" class="tablesorter"></table>
+            </div>
+        </section>
+
+        <section id='bottom' class="hide">
+            <div id='table3' class='table'>
+                <h1>GWAS catalog on(closed to) the Gene</h1>
+                <h4 class="hide" id='GWASdownload'>Download</h4>
+                <table id="GWAStable" class='tablesorter'>
+                </table>
+            </div>
+            <div id='table4' class='table'>
+                <h1>SIFT and Polyphen (Variant Effect Predictor)</h1>
+                <h4 class="hide" id='VEPdownload'>Download</h4>
+                <table id='VEPtable' class='tablesorter'>
+                </table>
+                <h1>Exome SNPs Poplulation Frequency</h1>
+                <h4 class="hide" id='Popdownload'>Download</h4>
+                <table id='Poptable' class='tablesorter'></table>
+                <h1>Genome SNPs Poplulation Frequency</h1>
+                <h4 class="hide" id='GPopdownload'>Download</h4>
+                <table id='GPoptable' class='tablesorter'></table>
+            </div>
+        </section>
+        <br>
+         <div style='text-aligned:center'>
+            <h1>Gene Structure</h1>
+            <center><img id="plotgene" alt='Genome browser' width='80%' height='80%'/></center>
+            <h1>Isoform Structure</h1>
+            <center><img id="plotiso" alt='Isoform browser' width='80%' height='80%'/></center>
+            <!--<div class="unload"></div>-->
+         </div>
+
+        <!-- choose a theme file -->
+        <link rel="stylesheet" href="css/theme.blue.css">
+        <link rel="stylesheet" href="webpage.css">
+        <link rel="stylesheet" href="bluetable.css">
+        <!-- load jQuery and tablesorter scripts -->
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="table2csv.js"></script> 
+        <link rel="icon" href="data:;base64,=">
+        <!--<script type="text/javascript" src="jquery.tablesorter.widgets.js"></script>-->
+
+        <script>                      
+        $(function(){
+            //fill the dropdown content in chr
+            for (i = 1; i<23; i++) {
+                 $("#Chr").append("<option value="+i+">"+i+"</option>");
+                 };
+            $("#Chr").append("<option value='X'> X </option>");
+            $("#Chr").append("<option value='Y'> Y </option>");
+            if ($(location).attr('href')!="http://localhost:8080/webpage_v1.html"){
+            url = window.location.href;
+            url = url.split('?')[1];
+            searchentry = url.split('=')[0];
+            if (searchentry=='symbol'){Checkgene();}
+            if (searchentry=='Chr'){Checkrange();}
+            if (searchentry=="SNP"){Checksnp();}
+            }
+
+            //$('#gene-panel').on('submit',function(event) {
+		//event.preventDefault();
+                //Checkgene();
+                //Plot1();	   
+                //Searchgene();
+                //SearchENST();
+                //SearchSNP();
+                //SearchGWAS();
+                //$("#Poptable").empty();
+                //$("#VEPtable").empty();
+            //});
+
+            $("#Chr").on('change',function(){
+               SelectChr();
+            });
+           
+            //$("#range-panel").on('submit',function(event){
+                //event.preventDefault();
+                //Checkrange();
+            //});
+
+            //$('#snp-panel').on('submit',function(event) {
+                //event.preventDefault();
+                //Checksnp();
+                //SearchVEP();
+                //Searchpop();
+            //});
+
+            $('#hidesnp').on('click',function(event){
+                $('#exome_header').hide();
+                $('#genome_header').hide();
+                $('#snpdownload').hide();
+                $('#gsnpdownload').hide();
+                $('#snptable').hide();
+                $('#gsnptable').hide();
+            });
+
+            $('#exomes').on('click',function(event){
+                $('#exome_header').show();
+                $('#genome_header').hide();
+                $('#snpdownload').show();
+                $('#gsnpdownload').hide();
+                $('#snptable').show();
+                $('#gsnptable').hide();
+            });
+
+            $('#genomes').on('click',function(event){
+                $('#exome_header').hide();
+                $('#genome_header').show();
+                $('#snpdownload').hide();
+                $('#gsnpdownload').show();
+                $('#snptable').hide();
+                $('#gsnptable').show();
+            });
+
+            $('#PDB-panel').on('submit',function(event) {
+                event.preventDefault();
+                Checkpdb();
+                //SearchVEP();
+                //Searchpop();
+            });
+
+            $('h4').on('click',function(event) {
+                $(event.target).next().table2csv({
+                 	"separator": ",",
+	                "newline": "\n",
+	                "quoteFields": true,
+	                "excludeColumns": "",
+	                "excludeRows": "",
+ 	                "trimContent": true,
+	                "filename": "table.csv",
+                 });
+            });
+
+
+            $("#gene_view").click(function(){
+                var rightnow = new Date();
+                url=$("#plot_gene").attr('src');
+                str='<!DOCTYPE html><html><head><title>Genome Browser</title></head><body><img src="'+url+'?'+rightnow.getTime()+'" width=100% height=100% /></body></html>';
+                var a=window.open("")
+                a.document.write(str);
+            });
+            $("#isoform_view").click(function(){
+                var rightnow = new Date();
+                url=$("#plot_iso").attr('src');
+                str='<!DOCTYPE html><html><head><title>Isoform Browser</title></head><body><img src="'+url+'?'+rightnow.getTime()+'" width=100% height=100% /></body></html>';
+                var a=window.open("")
+                a.document.write(str);
+            });
+
+            function Checkgene(){
+                //symbol = $('#symbol').val();
+                //ENSG = $('#ENSG').val();
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                //alert(symbol);
+                //alert(ENSG);
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchgene.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: successGene
+                });           
+            };
+            function successGene(returnData) {
+                // the main process have to be here<br>
+                var result = !$.trim(returnData);
+                $old_url = $(this).attr('href');
+                if (result) {
+                    alert('The gene you input is not found!')
+                 }
+                else {
+                    //old_url = window.location.href;
+                    //new_url = old_url+"?symbol="+symbol+"&"+"ENSG="+ENSG;
+                    //window.location.href = new_url;
+                    //$(this).attr('href',new_url);
+                    $("#top").attr('class','show');
+                    $("#middle").attr('class','show');
+                    $("#bottom").attr('class','show');
+                    $("#homepage").attr('class','hide');
+                    Plot1();
+                    Searchgene();
+                    SearchENST();
+                    SearchSNP();
+                    SearchGWAS();
+                    $("#Poptable").empty();
+                    $("#VEPtable").empty();
+                    }
+            };
+
+            function SelectChr(){
+                $("#start").attr('value','');
+                $("#end").attr('value','');
+                $("#end").attr('placeholder','');
+                $("#viewrange").attr('class','');
+                Chr = $("#Chr").val();
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/selectchr.py',
+                    type: 'get',
+                    data: {'submit':'submit','Chr':Chr},
+                    success:function(response){
+                        $("#end").attr('placeholder','Max:'+response);
+                    }
+                });
+            };
+
+            function Checkrange(){
+                //$("#start").attr('value','');
+                //$("#end").attr('value','');
+                //$("#end").attr('placeholder','');
+                //$("#viewrange").attr('class','');
+                //Chr = $("#Chr").val();
+                url = window.location.href;
+                entries = url.split('?')[1];
+                Chr = entries.split('=')[1];
+                Chr = Chr.split('&')[0];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/selectchr.py',
+                    type: 'get',
+                    data: {'submit':'submit','Chr':Chr},
+                    success:function(response){			
+                        url = window.location.href;
+                        entries = url.split('?')[1];
+                        Chr = entries.split('=')[1];
+                        Chr = Chr.split('&')[0];
+                        Start = entries.split('=')[2];
+                        Start = Number(Start.split('&')[0]);
+                        End = Number(entries.split('=')[3]);
+                        maxrange = Number(response);
+                        if (Chr !='' && Start>0 && Start<End && End <= maxrange){
+                            $("#top").attr('class','show');
+                            $("#homepage").attr('class','hide');
+                            $("#top div:eq(1)").attr('class','hide');
+                            Plotrange();
+                        } else{alert('Please input right range'+' '+Chr+' '+Start+' '+End+' '+maxrange);}
+ 
+                    }
+               });
+            };
+
+            function Plotrange(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                Chr = entries.split('=')[1];
+                Chr = Chr.split('&')[0];
+                Start = entries.split('=')[2];
+                Start = Start.split('&')[0];
+                End = entries.split('=')[3];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/range_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','Chr':Chr,'Start':Start,"End":End},
+                    success: function(response){
+                        $("#top div:eq(0)").attr('class','hide');
+                        $("#top div:eq(1)").attr('class','hide');
+                        var rightnow = new Date();
+                     
+                        $("#plot_gene").attr('src','https://bioed.bu.edu/images/students_20/xinyusun/RangePart.png?'+rightnow.getTime());
+                        $("#top div:eq(2)").attr('class',''); 
+                        //$(".top div:eq(3)").attr('class',''); 
+                    }
+                });
+            };
+
+            function Checksnp(){
+                //SNP = $('#SNP').val();
+                //base = $('#base').val();
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/checksnp.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP,'base':base},
+                    success: successSNP
+                });
+            };
+
+            function successSNP(returnData) {            
+                var result = !$.trim(returnData);
+                if (result) {
+                   alert('The snp you input is not found!')
+                 }
+                else {
+                    $("#top").attr('class','show');
+                    //$("#middle").attr('class','show');
+                    $("#bottom").attr('class','show');
+                    $("#homepage").attr('class','hide');
+                    Plot2();
+                    SearchVEP();
+                    Searchpop();
+                    }
+            }
+
+            function Checkpdb(){
+                PDB = $('#PDB').val();
+         
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/checkpdb.py',
+                    type: 'get',
+                    data: {'submit':'submit', 'PDB':PDB},
+                    success: successPDB
+                });
+            };
+            function successPDB(returnData) {
+                var result = !$.trim(returnData);
+                if (result) {
+                   alert('The PDB_ID you input is not found!')
+                 }
+                else {
+                   SendtoProtein();
+                   }
+            }
+
+
+ 
+            function Plot1(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/gene_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response){
+                        $("#top div:eq(0)").attr('class','hide');
+                        $("#top div:eq(1)").attr('class','hide');
+                        var rightnow = new Date();
+                        var rs=response.trim();
+                        //alert(rs);
+                        $("#plot_gene").attr('src','http://localhost:8080/Gene_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        $("#plot_iso").attr('src','http://localhost:8080/Gene_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotgene").attr('src','http://localhost:8080/Gene_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        $("#plotiso").attr('src','http://localhost:8080/Gene_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        $("#top div:eq(2)").attr('class',''); 
+                        $("#top div:eq(3)").attr('class',''); 
+                    }
+                });           
+            };
+
+
+            function Plot2(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                SNP = entries.split('=')[1];
+                SNP = SNP.split('&')[0];
+                base = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/snp_input_browser.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP,'base':base},
+                    success: function(response) {
+                        $("#top div:eq(0)").attr('class','hide');
+                        $("#top div:eq(1)").attr('class','hide');
+                        var rs=response.trim();
+                        //alert(rs);
+                        var rightnow = new Date();
+                        $("#plot_gene").attr('src','http://localhost:8080/SNP_Browser1_'+rs+'.png?'+rightnow.getTime());
+                        $("#plot_iso").attr('src','http://localhost:8080/SNP_Browser2_'+rs+'.png?'+rightnow.getTime());
+                        $("#top div:eq(2)").attr('class','');
+                        $("#top div:eq(3)").attr('class','');
+                    }
+                });
+            };
+
+            function Searchgene(){
+		 
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchgene.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+			var line = response.trim();
+                        var row = line.split("\t");
+                        //alert(row);
+                        //alert(row.length);		 
+                        //alert(row.slice(5,row.length));
+                        //alert(row.slice(5,row.length).join(' '));
+                        //rowlast = row.slice(5,row.length-2).join(' ');
+                        $('#genetable').empty();
+                        $('#genetable').append("<thead><tr><th> ENSG </th><th> Symbol </th><th> Chr </th><th> Start </th><th> End</th><th>Full Name</th><th>Gene Type</th></tr></thead>");
+                        $('#genetable').append("<tbody><tr><td style='text-decoration:underline;' class='ENSG_ID'>"+row[0]+"</td><td style='text-decoration:underline;' class='symbol_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr></tbody>");
+                      
+                        $("#genetable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#genedownload').attr('class','download');
+                        //$('#genetable').attr('class','');
+                    }
+                });
+
+            };
+          
+             
+            function SearchENST(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchENST.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#isotable').empty();
+                        $("#isotable").append("<thead><tr><th> ENST </th><th> Chr </th><th> Start </th><th> End </th><th> Type </th><th>PDBID</th></tr></thead><tbody>");        
+                        lines.forEach(function(value){
+                        	row = value.split(" ");
+                                $('#isotable').append("<tr><td class='ENST_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td></tr>");
+                        });
+			$("#isotable").append("</tbody>"); 
+                        $("#isotable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }     
+                        $('#isodownload').attr('class','download');
+                        //$('#isotable').attr('class','tablesorter');
+                    }
+                });
+
+            };
+            
+            function SearchSNP(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchsnp.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+                        
+                        var lines = response.trim().split('\n');
+                        $('#snptable').empty();
+                        $("#snptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Postion </th><th> REF</th><th> ALT</th><th> variant_type </th><th> allele_type </th></tr></thead><tbody>");        
+                        lines.forEach(function(value){
+                        	row = value.split(" ");
+                                $('#snptable').append("<tr><td class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td/><td>"+row[6]+"</td></tr>");
+                        });
+                        $("#snptable").append('</tbody>');
+                        //var resort = true,
+                        //callback = function( table ) {
+                        //alert( 'new sort applied' );
+                        //};
+                        //$("#snptable").trigger( 'update', [ resort, callback ] );
+                        $("#snptable").tablesorter({theme: 'blue'}); 
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#snpdownload').attr('class','download');
+                        //$('#snptable').attr('class','tablesorter');
+                    }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_Gene_Return_GenomeSNP.py',
+                    type: 'get',
+                    data: {'submit':'submit','symbol':symbol,'ENSG':ENSG},
+                    success: function(response) {
+
+                        var lines = response.trim().split('\n');
+                        $('#gsnptable').empty();
+                        $("#gsnptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Postion </th><th> REF</th><th> ALT</th><th> variant_type </th><th> allele_type </th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                                row = value.split(" ");
+                                $('#gsnptable').append("<tr><td class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td/><td>"+row[6]+"</td></tr>");
+                        });
+                        $("#gsnptable").append('</tbody>');
+                        //var resort = true,
+                        //callback = function( table ) {
+                        //alert( 'new sort applied' );
+                        //};
+                        //$("#gsnptable").trigger( 'update', [ resort, callback ] );
+                        $("#gsnptable").tablesorter({theme: 'blue'});
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#gsnpdownload').attr('class','download');
+                        //$('#gsnptable').attr('class','tablesorter');
+                    }
+                }); 
+          }
+
+            function SearchGWAS(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                symbol = entries.split('=')[1];
+                symbol = symbol.split('&')[0];
+                ENSG = entries.split('=')[2];
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchgwas.py',
+                

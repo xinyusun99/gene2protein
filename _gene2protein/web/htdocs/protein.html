@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ViewProtein</title>
+    </head>
+<style>
+.loader {
+  margin:0 auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  
+#loadtext {color:blue}
+
+//#table2{
+//    height: 300px;
+//    overflow: scroll;
+//}
+</style>
+    <body>
+       <header>
+            <nav>
+                <ul>
+                    <li style='margin-left:1350px;'><img src='http://localhost:8080/bulogo.png' alt='BU logo' width="85%" height="85%"/></li>
+                    <center><strong style='font-size:30px'>Gene2Protein</strong></center>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_v1.html">Home</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/tutorial.html">Tutorial</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_contact.html">Contact</a></li>
+
+                </ul>
+            </nav>
+        </header>
+
+        <section id='headinfo'>
+            <h1 id='input_value' style='font-size:40px'>Test</h1>
+            <h1 id='external_ref' style='font-size:20px'>External references</h1>
+            <center><u><a id='ncbiREF' style='color:black'>NCBI</a></u>&nbsp;&nbsp;&nbsp;
+            <u><a id='PDBREF' style='color:black;display:inline'>RCSB PDB</a></u>&nbsp;&nbsp;&nbsp;
+            <u><a id='PDBeREF' style='color:black;display:inline'>PDBe</a></u></center>           
+        </section>
+        
+        <br>
+        
+        <div id="table0" class='hide'>
+            <!--h2 align="center">Gene</h2>
+            <h4 id='genedownload'>Download</h4-->
+            <table style="padding:0 100px;" id='genetable' class='tablesorter'></table>
+            <!--h2 align="center">Isoform</h2>
+            <h4 id='isodownload'>Download</h4-->
+            <table style="padding:0 100px;" id="isotable" class='tablesorter'></table>
+        </div>
+        
+        <br>
+        
+        <div>
+            <center><input type="button" id="view" value="View 3D Structure"></center>
+            <br>
+            <center>
+                <form id='res' class="hide"> 
+                <h3>Advanced settings</h3>
+                residue_num&nbsp;<input type='text' id='residue' name='residue'>&nbsp;&nbsp;&nbsp;
+                chain_num&nbsp;<input type='text' id='chain' name='chain'>&nbsp;
+                <input type='submit' id='viewbyr' value='View Residue'>
+                </form>
+            </center>
+            <br>
+            <center>
+                <form id='snp' class="hide">
+                range for nearby SNPs:&nbsp;<select name="range_nearby" id="range_nearby">
+                    <option value="3">3 angstrom</option>
+                    <option value="4">4 angstrom</option>
+                    <option value="5">5 angstrom</option>
+                    <option value="6">6 angstrom</option>
+                    <option value="7">7 angstrom</option>
+                    <option value="8">8 angstrom</option>
+                    <option value="9">9 angstrom</option>
+                </select>
+                <br><br>
+                SNP ID &nbsp;<input type='text' id='snpID' name='snpID'>&nbsp;&nbsp;&nbsp;
+                <input type='submit' id='viewbys' value='View SNP'>
+                </form>
+            </center>
+	<!--<p>above has the link to see protein</p>-->
+        </div>
+        
+        <br><br>
+        
+        <center>
+        <div style="overflow-x:auto;overflow-y:auto;max-height:600px;width:1300px;" class="hide" id="table1">
+            <h2 id='coordinate_header'>SNP 3D Coordinate</h2>
+            <table id="prosnptable" class="tablesorter"></table>
+        </div>
+            <br>
+        <div hidden id="nearby_settings">
+            <h2 align="center" id="nearby_header">Nearby SNPs Information</h2>
+            <input id="selectall" type="checkbox" class="parent_check">Select all &nbsp;&nbsp;
+            <button type="button" id='view_selected'>View selected nearby SNPs</button>
+        </div>
+        <br><br>
+        <div style="overflow-x:auto;overflow-y:auto;max-height:800px;width:1300px;" class="hide" id="table1_2">
+            <h4 class="hide" id='nearbydownload'>Download</h4>
+            <table id="nearby_snp" class='tablesorter'>
+            </table>
+            <div class="unload"></div>
+            <p id="loadtext1" align="center">loading table</p>
+        </div>
+        </center>
+        <br>
+        <center>
+        <h2 align='center'>SNPs on the Protein</h2>
+        <p hidden style='color:black;' id='click_info'>(Click the SNPs on the table to view its nearby SNPs)</p>
+        <button type="button" id='view_selected2'>View selected SNPs</button>
+        <p hidden style='color:black;display:inline' id='total_snp'></p>
+        <br><br>
+        <div style="overflow-x:auto;overflow-y:auto;max-height:600px;width:1300px;" class="table" id="table2">
+            <h4 hidden id='snpdownload'>Download</h4>
+            <table id="protein_snp" class='hide'></table>
+            <div class="unload"></div>
+            <p id="loadtext2" align="center" class="hide">loading table</p>
+        </div>
+        </center>
+        
+        <br>
+        
+        <!--div hidden id='snp_anno'>
+            <h2 align="center" id="anno_header">SNP annotation</h2>
+            <table style="padding:0 200px;" id="snptable" class="tablesorter"></table>
+            <br>
+            <h3>Population Frequency</h3>
+            <h5>Exomes</h5>
+            <table style="padding:0 200px;" id='Poptable' class='tablesorter'></table>
+            <h5>Genomes</h5>
+            <table style="padding:0 200px;" id='GPoptable' class='tablesorter'></table>
+            <br>
+            <h3>SIFT and Polyphen </h3>
+            <table style="padding:0 100px;" id='VEPtable' class='tablesorter'></table>
+            <br>
+            <h3>GWAS catalog</h3>
+            <table style="padding:0 200px;" id="GWAStable" class='tablesorter'></table>
+         </div-->   
+            
+        <div class="link">
+        </div>
+        <script type="text/javascript" src="https://chemapps.stolaf.edu/jmol/jmol.php?pdbid=2HEY&link=protein_highlighted&script=restrict not water; spacefill off; wireframe off; ribbons on; select 211:R; color red; spacefill 2.0&inline">
+        </script>
+        <link rel="stylesheet" href="css/theme.blue.css">
+        <link rel="stylesheet" href="webpage.css">
+        <link rel="stylesheet" href="bluetable.css">
+        <!-- load jQuery and tablesorter scripts -->
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="table2csv.js"></script> 
+        <link rel="icon" href="data:;base64,=">
+        <script>
+        $(function(){
+            $("#nearby_snp").append("<thead><tr><th>Select</th><th> Name </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th><th> ENST </th><th> Consequence </th><th> Sift Prediction </th><th> Sift Score </th><th> Polyphen Prediction </th><th> Polyphen Score </th></tr></thead><tbody>");
+            var url = window.location.href;
+            PDB = url.split('=')[1];
+            PDB = PDB.split('&')[0];
+            Return_Gene_Isoform();
+            $("#res").show();
+            $("#snp").show();
+            $("#view").on('click',function(){
+                View3D();
+            });
+                    
+            $parentChexbox = $('.parent_check'), 
+            $dataBox = $('#nearby_snp'),            
+            $sonCheckBox = $('.son_check');   
+ 
+            $parentChexbox.click(function () {
+                var $checkboxs = $dataBox.find('input[type="checkbox"]');
+                if ($(this).is(':checked')) {
+                    $checkboxs.prop("checked", true);
+                } else {
+                    $checkboxs.prop("checked", false);
+                }
+            });
+    
+            $sonCheckBox.each(function () {
+                $(this).click(function () {
+                    if ($(this).is(':checked')) {
+                        var len = $sonCheckBox.length;
+                        var num = 0;
+                        $sonCheckBox.each(function () {
+                            if ($(this).is(':checked')) {
+                                num++;
+                            }
+                        });
+                        if (num == len) {
+                            $parentChexbox.prop("checked", true);
+                        }
+                    } else {
+                        $parentChexbox.prop("checked", false);
+                    }
+                })
+            });
+
+            $('h4').on('click',function(event) {
+                $(event.target).next().table2csv({
+                 	"separator": ",",
+	                "newline": "\n",
+	                "quoteFields": true,
+	                "excludeColumns": "",
+	                "excludeRows": "",
+ 	                "trimContent": true,
+	                "filename": "table.csv",
+                 });
+            });
+
+            $("#res").on("submit",function(event){
+                event.preventDefault();
+                Viewres();
+            });
+            $("#snp").on("submit",function(event){
+                event.preventDefault();
+                Viewsnp();
+            });
+            
+            $("#view_selected").on("click",function(event){
+                $("div.link").empty();
+                var range = $("#range_nearby").val();
+                //var main_chain = $("#prosnptable td").eq(3).html();
+                //var main_residue = $("#prosnptable td").eq(4).html();
+                var main_chain = $("#prosnptable tr:eq(1) td").eq(3).html();
+                var main_residue = $("#prosnptable tr:eq(1) td").eq(4).html();
+                var selected_url = '<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B';
+                $('input[name="NBS"]').each(function(){
+                    var state = $(this).prop('checked');
+                    if (state) {
+                        var record = $(this).val().split(",");
+                        var selected_chain = record[0];
+                        var selected_residue = record[1];
+                        if (typeof(selected_chain) != "undefined" && typeof(selected_residue) != "undefined"){
+                            selected_url = selected_url + '+select+'+selected_residue+'%3A'+selected_chain+'%3B+color+blue%3B+spacefill+1.0%3B';
+                        };
+                    };
+                });
+                selected_url = selected_url +'+select+'+main_residue+'%3A'+main_chain+'%3B+color+red%3B+spacefill+1.0%3B';
+                selected_url = selected_url +'+boundbox+{'+main_residue+'%3A'+main_chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>';
+                $("div.link").append(selected_url);
+                $("div.link a").trigger('click');
+            })
+            
+            $("#view_selected2").on("click",function(event){
+                $("div.link").empty();
+                var selected_url2 = '<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B';
+                $('input[name="SonP"]').each(function(){
+                    var state = $(this).prop('checked');
+                    if (state) {
+                        var record = $(this).val().split(",");
+                        var selected_chain = record[0];
+                        var selected_residue = record[1];
+                        if (typeof(selected_chain) != "undefined" && typeof(selected_residue) != "undefined"){
+                            selected_url2 = selected_url2 + '+select+'+selected_residue+'%3A'+selected_chain+'%3B+color+red%3B+spacefill+1.0%3B';
+                        };
+                    };
+                });
+                selected_url2 = selected_url2 +'&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>';
+                $("div.link").append(selected_url2);
+                $("div.link a").trigger('click');
+            })
+            
+            $('#genetable').on("click","td.ENSG_ID",function(){
+                var rightnow = new Date();
+                var ENSGval = $(this).html();
+                var URLGENE = 'http://localhost:8080/webpage_v1.html?symbol=&ENSG='+ENSGval;
+                window.open(URLGENE);
+            })
+           
+            $('#genetable').on("click","td.symbol_ID",function(){
+                var symbolval = $(this).html();
+                var rightnow = new Date();
+                var URLGENE = 'http://localhost:8080/webpage_v1.html?symbol='+symbolval+'&ENSG=';
+                window.open(URLGENE);
+            })
+            
+            $('#isotable').on("click","td.ENST_ID",function(){
+                var rightnow = new Date();
+                var ENST=$(this).html();
+                var URLENST = 'http://grch37.ensembl.org/Homo_sapiens/Transcript/Summary?t='+ENST;
+                window.open(URLENST);
+            })
+            
+            //$('#snptable').on("click","td.rsID",function(){
+            //    //$('#snptable td.rs_ID').css({"fontWeight":"normal"});
+            //    var rightnow = new Date();
+            //    var SNPval=$(this).html();
+            //    var URLSNP = 'http://localhost:8080/webpage_v1.html?SNP='+SNPval+'&'+rightnow.getTime();
+            //    window.open(URLSNP);
+            //})
+            
+            $('#prosnptable').on("click","td.rsID",function(){
+                //$('#snptable td.rs_ID').css({"fontWeight":"normal"});
+                var rightnow = new Date();
+                var SNPval=$(this).html();
+                var URLSNP = 'http://localhost:8080/webpage_v1.html?SNP='+SNPval+'&'+rightnow.getTime();
+                window.open(URLSNP);
+            })
+            
+            $('#nearby_snp').on("click","td.rs_nearby",function(){
+                var rightnow = new Date();
+                var SNPval=$(this).html();
+                var URLSNP = 'http://localhost:8080/webpage_v1.html?SNP='+SNPval+'&'+rightnow.getTime();
+                window.open(URLSNP);
+                //$('#nearby_snp td.rs_nearby').css({"fontWeight":"normal"})
+                //$(this).css({"fontWeight":"bold"});
+                //var main_chain = $("#prosnptable td").eq(3).html();
+                //var main_residue = $("#prosnptable td").eq(4).html();
+                //var nearby_chain = $(this).nextAll().eq(2).html();
+                //var nearby_residue = $(this).nextAll().eq(3).html();
+                //var range = $("#range_nearby").val();
+                //$("div.link").empty();
+                //$("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+main_residue+'%3A'+main_chain+'%3B+color+red%3B+spacefill+1.0%3B+select+'+nearby_residue+'%3A'+nearby_chain+'%3B+color+blue%3B+spacefill+1.0%3B+boundbox+{'+main_residue+'%3A'+main_chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+                //$("div.link a").trigger('click');
+            })
+
+            $('#protein_snp').on("click","td.rs_ID",function(event){
+                $('#protein_snp td.rs_ID').css({"fontWeight":"normal"})
+                var SNP=$(this).html();
+                $(this).css({"fontWeight":"bold"});
+                ClickSNP(event);
+                //$("#snp_anno").show();
+                //$("#anno_header").text("SNP annotation: "+SNP);
+                range = $("#range_nearby").val();
+                $("#nearby_header").text("Nearby SNPs of "+SNP+" in "+range+" angstrom");
+                //window.location.hash = "#snp_anno";
+                /*
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_Snpinfo.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#snptable').empty();
+                        $("#snptable").append("<thead><tr><th> SNP </th><th> Chr </th><th> Postion </th><th> REF</th><th> ALT</th><th> variant_type </th><th> allele_type </th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                                row = value.split("\t");
+                                $('#snptable').append("<tr><td style='text-decoration:underline;cursor:pointer;' class='rsID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr>");
+                            });
+                        };
+                        $("#snptable").append('</tbody>');
+                        $("#snptable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#snpdownload').attr('class','download');
+                        //$('#snptable').attr('class','tablesorter');
+                    }
+                });
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchvep.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#VEPtable').empty();
+                        $("#VEPtable").append("<thead><tr><th> SNP </th><th> ENST </th><th> Chr </th><th> REF </th><th> ALT </th><th> Start_at </th><th> End_at </th><th> Consequence </th><th> Sift_Pre </th><th> Sift_Score </th><th> Polyphen_Pre </th><th> Polyphen_Score </th></tr></thead><tbody>");     
+                        if (!$.trim(response)){
+                            response.trim();
+                            //alert("No information for VEP data")
+                        }else{
+                            lines.forEach(function(value){
+                        	      row = value.split("\t");
+                                $('#VEPtable').append("<tr><td class='VEP_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td><td>"+row[12]+"</td></tr>");
+                            });
+                        }
+                        $("#VEPtable").append("</tbody>");
+                        $("#VEPtable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#VEPdownload').attr('class','download');
+                        //$('#VEPtable').attr('class','tablesorter');
+                    }
+                });
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/new_searchpop.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#Poptable').empty();
+                        $("#Poptable").append("<thead><tr><th>SNP</th><th>REF</th><th>ALT</th><th>Population</th><th>Allele count</th><th>Allele Number</th><th>Allele Frequency</th><th>Number of Homozygotes</th></tr></thead><tbody>");        
+                        if (!$.trim(response)){
+                            response.trim();
+                            //alert("No information for Population data!")
+                        } else {
+                            lines.forEach(function(value){
+                        	      row = value.split(" ");
+                                $('#Poptable').append("<tr><td class='PF_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Africa</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>South Asia</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Latino</td><td>"+row[12]+"</td><td>"+row[13]+"</td><td>"+row[14]+"</td><td>"+row[15]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>East Asia</td><td>"+row[16]+"</td><td>"+row[17]+"</td><td>"+row[18]+"</td><td>"+row[19]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (non-Finnish)</td><td>"+row[20]+"</td><td>"+row[21]+"</td><td>"+row[22]+"</td><td>"+row[23]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (Finnish)</td><td>"+row[24]+"</td><td>"+row[25]+"</td><td>"+row[26]+"</td><td>"+row[27]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Ashkenazi Jewish</td><td>"+row[28]+"</td><td>"+row[29]+"</td><td>"+row[30]+"</td><td>"+row[31]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Other</td><td>"+row[32]+"</td><td>"+row[33]+"</td><td>"+row[34]+"</td><td>"+row[35]+"</td></tr>");
+                            });
+                        }
+                        $("#Poptable").append("</tbody>");
+                        $("#Poptable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#Popdownload').attr('class','download');
+                        //$('#Poptable').attr('class','tablesorter');
+                    }
+                });
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_GenomePF.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#GPoptable').empty();
+                        $("#GPoptable").append("<thead><tr><th>SNP</th><th>REF</th><th>ALT</th><th>Population</th><th>Allele count</th><th>Allele Number</th><th>Allele Frequency</th><th>Number of Homozygotes</th></tr></thead><tbody>");
+                        if (!$.trim(response)){
+                            response.trim();
+                            //alert("No information for Genome Population data!");
+                        } else {
+                            lines.forEach(function(value){
+                                row = value.split(" ");
+                                $('#GPoptable').append("<tr><td class='PF_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Africa</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>South Asia</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Latino</td><td>"+row[12]+"</td><td>"+row[13]+"</td><td>"+row[14]+"</td><td>"+row[15]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>East Asia</td><td>"+row[16]+"</td><td>"+row[17]+"</td><td>"+row[18]+"</td><td>"+row[19]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (non-Finnish)</td><td>"+row[20]+"</td><td>"+row[21]+"</td><td>"+row[22]+"</td><td>"+row[23]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>European (Finnish)</td><td>"+row[24]+"</td><td>"+row[25]+"</td><td>"+row[26]+"</td><td>"+row[27]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Ashkenazi Jewish</td><td>"+row[28]+"</td><td>"+row[29]+"</td><td>"+row[30]+"</td><td>"+row[31]+"</td></tr>"+
+"<tr><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>Other</td><td>"+row[32]+"</td><td>"+row[33]+"</td><td>"+row[34]+"</td><td>"+row[35]+"</td></tr>");
+                            });
+                        }
+                        $("#GPoptable").append("</tbody>");
+                        $("#GPoptable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#GPopdownload').attr('class','download');
+                        //$('#Poptable').attr('class','tablesorter');
+                    }
+                }); 
+                
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_SNP_Return_GWAScatalog.py',
+                    type: 'get',
+                    data: {'submit':'submit','SNP':SNP},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#GWAStable').empty();
+                        $("#GWAStable").append("<thead><tr><th> Chr </th><th> Position </th><th> Trait </th><th> SNP </th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                                row = value.split("\t");
+                                //trait = row.slice(2,row.length-1).join(" ");
+                                $('#GWAStable').append("<tr><td>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td class='gwas_snp'>"+row[3]+"</td></tr>");
+                            });
+                        };
+                        $("#GWAStable").append("</tbody>");
+                        $("#GWAStable").tablesorter({theme: 'blue'});
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        //$('#GWASdownload').attr('class','download');
+                        //$('#GWAStable').attr('class','tablesorter');
+                    }
+                });
+                */        
+            });
+
+            function Return_Gene_Isoform(){
+                url = window.location.href;
+                entries = url.split('?')[1];
+                PDB = entries.split('=')[1];
+                PDB = PDB.split('&')[0];
+                $("#input_value").text(PDB.toUpperCase());
+                $("#ncbiREF").attr('href','https://www.ncbi.nlm.nih.gov/Structure/pdb/'+PDB);
+                $("#PDBREF").attr('href','https://www.rcsb.org/structure/'+PDB);           
+                $("#PDBeREF").attr('href','https://www.ebi.ac.uk/pdbe/entry/pdb/'+PDB);
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_Protein_Return_Gene.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB},
+                    success: function(response) {
+                        var line = response.trim();
+                        var row = line.split("\t");
+                        $('#genetable').empty();
+                        $('#genetable').append("<thead><tr><th> ENSG </th><th> Symbol </th><th> Chr </th><th> Start </th><th> End</th><th>Full Name</th><th>Gene Type</th></tr></thead>");
+                        $('#genetable').append("<tbody><tr><td style='text-decoration:underline;' class='ENSG_ID'>"+row[0]+"</td><td style='text-decoration:underline;cursor:pointer;' class='symbol_ID'>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td></tr></tbody>");
+
+                        $("#genetable").tablesorter({theme: 'blue'});
+                        $("#table0").attr("class","show");
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        $('#genedownload').attr('class','download');
+                        //$('#genetable').attr('class','');
+                    }
+                });
+
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/Search_Protein_Return_Isoform.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');
+                        $('#isotable').empty();
+                        $("#isotable").append("<thead><tr><th> ENST </th><th> Chr </th><th> Start </th><th> End </th><th> Type </th><th>PDBID</th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                                row = value.split(" ");
+                                $('#isotable').append("<tr><td style='text-decoration:underline;' class='ENST_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td></tr>");
+                        });
+                        $("#isotable").append("</tbody>");
+                        $("#isotable").tablesorter({theme: 'blue'});
+                        $("#table0").attr("class","show");
+  if ( $('.focus-highlight').length ) {
+    $('.focus-highlight').find('td, th')
+      .attr('tabindex', '1')
+      // add touch device support
+      .on('touchstart', function() {
+        $(this).focus();
+      });
+  }
+                        $('#isodownload').attr('class','download');
+                        //$('#isotable').attr('class','tablesorter');
+                    }
+                });
+ 
+            }
+            
+            function View3D(){
+                $("div.link").empty();
+                $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=select+protein+or+nucleic%3Bcartoons+only%3Bcolor+structure&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein3D</a>');
+                $("div.link a").trigger('click');
+            };
+                
+            if (PDB!==""){
+               ShowTable(PDB);}
+            
+            function ShowTable(PDB){
+                $("div.unload").attr("class","loader");
+                $("#loadtext").attr("class","");
+                $.ajax({
+                   url: 'http://localhost:8080/cgi-bin/Search_Protein_Return_SNP.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB},
+                    success: function(response) {
+                        var lines = response.trim().split('\n');                
+                        $('#protein_snp').empty();
+                        $("#protein_snp").append("<thead><tr><th> Select </th><th> Name </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th><th> ENST </th><th> Consequence </th><th> Sift Prediction </th><th> Sift Score </th><th> Polyphen Prediction </th><th> Polyphen Score </th></tr></thead><tbody>");
+                        if (response) {
+                            lines.forEach(function(value){
+                                row = value.split("\t");
+                                $('#protein_snp').append("<tr><td><input type='checkbox' name='SonP' value="+row[3]+","+row[4]+" /></td><td style='text-decoration:underline;cursor:pointer;' class='rs_ID'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>");         
+                            });
+                            $('#protein_snp').append("</tbody>");
+                            $("#res").attr("class","");
+                            $("#snp").attr("class","");
+                            //$("#loading-image").attr("class","hide");
+                            $("#protein_snp").attr("class","tablesorter");
+                            $("div.loader").attr("class","unload");
+                            $("#loadtext").attr("class","hide");
+                            $("#protein_snp").tablesorter({theme: 'blue'});
+                            $("#total_snp").show();
+                            $("#click_info").show();
+                            len =$("#protein_snp tr").length - 1;
+                            document.getElementById("total_snp").innerHTML="Total:" + len + " records";
+                            if ( $('.focus-highlight').length ) {
+                                $('.focus-highlight').find('td, th')
+                                .attr('tabindex', '1')
+                                // add touch device support
+                                .on('touchstart', function() {
+                                    $(this).focus();
+                                });
+                            }
+                            $("#snpdownload").show();
+                            $("#snpdownload").attr('class','');
+                        } else {
+                            //alert("no SNP information")
+                            $("#protein_snp").attr("class","tablesorter");
+                            $("#protein_snp").tablesorter({theme: 'blue'});
+                            $("#loadtext").attr("class","hide");
+                            $("div.loader").attr("class","unload");
+                        }
+                    }
+                });
+            };
+                
+             
+            //function Plot3(PDB){
+            //    $.ajax({
+            //       url: 'http://localhost:8080/cgi-bin/test_update_pdb_image.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','PDB':PDB},
+            //        success: function(response) {
+            //            var rightnow = new Date();
+            //            $("#plot_pdb").attr('src','https://bioed.bu.edu/images/students_20/xinyusun/highlight_pdb.png?'+rightnow.getTime());
+                        
+            //        }
+            //   }); 
+            //    $.ajax({
+            //        url: 'http://localhost:8080/cgi-bin/Search_Protein_Return_SNP.py',
+            //        type: 'get',
+            //        data: {'submit':'submit','PDB':PDB},
+            //        success: function(response) {
+            //            var lines = response.trim().split('\n');
+            //    
+            //            $('#protein_snp').empty();
+            //            $("#protein_snp").append("<tr><th> SNP </th><th> chr </th><th> Position </th></tr>");
+            //            lines.forEach(function(value){
+            //                row = value.split("\t");
+            //                //alert(row);                       
+            //                $('#protein_snp').append("<tr><td>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td></tr>");         
+            //            })
+        
+            
+            function ClickSNP(event){
+                var main_snp = $(event.target).html();
+                var main_chain = $(event.target).nextAll().eq(2).html();
+                var main_residue = $(event.target).nextAll().eq(3).html();
+                $("#coordinate_header").text("SNP 3D Coordinate");
+                $("#prosnptable").empty();
+                $("#prosnptable").append("<thead><tr><th> Name </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th><th> ENST </th><th> Consequence </th><th> Sift Prediction </th><th> Sift Score </th><th> Polyphen Prediction </th><th> Polyphen Score </th></tr></thead><tbody>");
+                $("#protein_snp tbody td:nth-child(2)").each(function(){
+                    if(main_snp==$(this).html()){
+                        var snp = $(this).html();
+                        var chr = $(this).nextAll().eq(0).html();
+                        var pos = $(this).nextAll().eq(1).html();
+                        var residue = $(this).nextAll().eq(3).html();
+                        var chain = $(this).nextAll().eq(2).html();
+                        var PDBID = $(this).nextAll().eq(4).html(); 
+                        var ENST = $(this).nextAll().eq(5).html();
+                        var consequence = $(this).nextAll().eq(6).html();
+                        var sift_pre = $(this).nextAll().eq(7).html(); 
+                        var sift_score = $(this).nextAll().eq(8).html();
+                        var polyphen_pre = $(this).nextAll().eq(9).html();
+                        var polyphen_score = $(this).nextAll().eq(10).html();
+                
+                        $("#prosnptable").append("<tr><td style='text-decoration:underline;cursor:pointer;' class='rsID'>"+snp+"</td><td>"+chr+"</td><td>"+pos+"</td><td>"+chain+"</td><td>"+residue+"</td><td>"+PDBID+"</td><td>"+ENST+"</td><td>"+consequence+"</td><td>"+sift_pre+"</td><td>"+sift_score+"</td><td>"+polyphen_pre+"</td><td>"+polyphen_score+"</td></tr>");   
+                    }
+                })      
+                $("#prosnptable").append("</tbody>");
+                $("#prosnptable").tablesorter({theme: 'blue'});
+                ShowTable_nearSNP(PDB,main_residue,main_chain);
+                $("div.link").empty();
+                range = $("#range_nearby").val();
+                //$("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+main_residue+'%3A'+main_chain+'%3B+color+red%3B+spacefill+1.0%3B+boundbox+{'+main_residue+'%3A'+main_chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+                $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+within('+range+','+main_residue+':'+main_chain+')%3B+color+blue%3B+spacefill+1.0%3B+select+'+main_residue+'%3A'+main_chain+'%3B+color+red%3B+spacefill+1.0%3B+boundbox+{'+main_residue+'%3A'+main_chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+                $("div.link a").trigger('click');
+            };
+
+            function Viewres(){
+                residue = $("#residue").val();
+                chain = $("#chain").val();
+                //var judge = false;
+                var range = $("#range_nearby").val();
+                $("div.link").empty();
+                $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+within('+range+','+residue+':'+chain+')%3B+color+blue%3B+spacefill+1.0%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+1.0%3B+boundbox+{'+residue+'%3A'+chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+                $("div.link a").trigger('click');
+                $("#table1").attr("class","table");
+                $("#table1_2").attr("class","table");
+                $("#nearby_settings").show();
+                $("#nearbydownload").attr("class","hide");
+                $("#nearby_snp").hide();
+                $("#prosnptable").empty();
+                $("#prosnptable").append("<thead><tr><th> Name </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th><th> ENST </th><th> Consequence </th><th> Sift Prediction </th><th> Sift Score </th><th> Polyphen Prediction </th><th> Polyphen Score </th></tr></thead><tbody>");
+                $("#prosnptable").show();
+                $("#nearby_header").text("Nearby SNPs of "+chain+":"+residue+" in "+range+" angstrom");
+                $("#coordinate_header").text("SNP 3D Coordinate of "+chain+":"+residue)
+                $("#snp_anno").hide();
+                $("#protein_snp tbody td:nth-child(2)").each(function(){
+                    if(chain==$(this).nextAll().eq(2).html() && residue==$(this).nextAll().eq(3).html()){
+                        var snp = $(this).html();
+                        var chr = $(this).nextAll().eq(0).html();
+                        var pos = $(this).nextAll().eq(1).html();
+                        var PDBID = $(this).nextAll().eq(4).html(); 
+                        var ENST = $(this).nextAll().eq(5).html();
+                        var consequence = $(this).nextAll().eq(6).html();
+                        var sift_pre = $(this).nextAll().eq(7).html(); 
+                        var sift_score = $(this).nextAll().eq(8).html();
+                        var polyphen_pre = $(this).nextAll().eq(9).html();
+                        var polyphen_score = $(this).nextAll().eq(10).html();     
+                        $("#prosnptable").append("<tr><td style='text-decoration:underline;cursor:pointer;' class='rsID'>"+snp+"</td><td>"+chr+"</td><td>"+pos+"</td><td>"+chain+"</td><td>"+residue+"</td><td>"+PDBID+"</td><td>"+ENST+"</td><td>"+consequence+"</td><td>"+sift_pre+"</td><td>"+sift_score+"</td><td>"+polyphen_pre+"</td><td>"+polyphen_score+"</td></tr>");         
+                    }   
+                })
+                $("#prosnptable").append("</tbody>");
+                $("#prosnptable").tablesorter({theme: 'blue'});
+                ShowTable_nearSNP(PDB,residue,chain);   
+                        //$("#prosnptable").append("<thead><tr><th> SNP </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th></tr></thead><tbody>");
+                        //$("#prosnptable").append("<tr><td style='text-decoration:underline;cursor:pointer;' class='rsID'>"+snp+"</td><td>"+chr+"</td><td>"+pos+"</td><td>"+chain+"</td><td>"+residue+"</td><td>"+PDBID+"</td></tr>");         
+                        //$("#prosnptable").append("</tbody>");
+                        //$("#prosnptable").tablesorter({theme: 'blue'});
+                //$("#protein_snp tbody td:nth-child(4)").each(function(){
+                //    if(chain==$(this).html() && residue==$(this).next().html()){      
+                //        judge=true;
+                //        return false;
+                //    }
+                //});
+                //if (judge){
+                    //$("div.link").empty();
+                    //$("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+2.0&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');               
+                    //$("div.link a").trigger("click");
+                    //ShowTable_nearSNP(PDB,residue,chain);
+                //} else {
+                //    $("div.link").empty();
+                //    $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+1.0%3B+boundbox+{'+residue+'%3A'+chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');               
+                //    $("div.link a").trigger("click");
+                //};
+            };
+
+            function Viewsnp(){
+                var snp = $("#snpID").val();
+                //alert(typeof snp);
+                judge = false;
+                $("#coordinate_header").text("SNP 3D Coordinate");
+                $("#prosnptable").empty();
+                $("#prosnptable").append("<thead><tr><th> Name </th><th> chr </th><th> Position </th><th> Chain </th><th> Residue </th><th> PDBID </th><th> ENST </th><th> Consequence </th><th> Sift Prediction </th><th> Sift Score </th><th> Polyphen Prediction </th><th> Polyphen Score </th></tr></thead><tbody>");
+                //$("#protein_snp").trigger("update");
+                //$("#protein_snp tbody td:nth-child(2)").each(function(){
+                $("#protein_snp tbody tr").each(function(){
+                    //alert(typeof $(this).children('td').eq(1).html());
+                    if(snp==$(this).children('td').eq(1).html()){
+                        judge = true;
+                        residue = $(this).children('td').eq(5).html();
+                        chain = $(this).children('td').eq(4).html();
+                        var chr = $(this).children('td').eq(2).html();
+                        var pos = $(this).children('td').eq(3).html();
+                        var PDBID = $(this).children('td').eq(6).html();
+                        var ENST = $(this).children('td').eq(7).html();
+                        var consequence = $(this).children('td').eq(8).html();
+                        var sift_pre = $(this).children('td').eq(9).html(); 
+                        var sift_score = $(this).children('td').eq(10).html();
+                        var polyphen_pre = $(this).children('td').eq(11).html();
+                        var polyphen_score = $(this).children('td').eq(12).html();
+                        $("#prosnptable").append("<tr><td style='text-decoration:underline;cursor:pointer;' class='rsID'>"+snp+"</td><td>"+chr+"</td><td>"+pos+"</td><td>"+chain+"</td><td>"+residue+"</td><td>"+PDBID+"</td><td>"+ENST+"</td><td>"+consequence+"</td><td>"+sift_pre+"</td><td>"+sift_score+"</td><td>"+polyphen_pre+"</td><td>"+polyphen_score+"</td></tr>");
+                        //return false;
+                    }
+                });
+                $("#prosnptable").append("</tbody>");
+                //$("#prosnptable").trigger("update");
+                $("#prosnptable").tablesorter({theme: 'blue'});
+                if (judge){
+                    range = $("#range_nearby").val();
+                    $("div.link").empty();
+                    $("div.link").append('<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B+select+within('+range+','+residue+':'+chain+')%3B+color+blue%3B+spacefill+1.0%3B+select+'+residue+'%3A'+chain+'%3B+color+red%3B+spacefill+1.0%3B+boundbox+{'+residue+'%3A'+chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>');
+                    $("div.link a").trigger("click");
+                    ShowTable_nearSNP(PDB,residue,chain);
+                    //$("#snp_anno").show();
+                    //$("#anno_header").text("SNP annotation: "+snp);
+                    $("#nearby_header").text("Nearby SNPs of "+snp+" in "+range+" angstrom");
+                } else {
+                    alert('Your Input is Not Found')
+                }
+            };
+
+            function ShowTable_nearSNP(PDB,residue,chain){ 
+                $("#table1").attr("class","table");
+                $("#table1 .unload").attr("class","loader");
+                $("#table1 p").attr("class","");
+                $("#table1_2").attr("class","table");
+                $("#table1_2 .unload").attr("class","loader");
+                $("#table1_2 p").attr("class","");
+                $("#nearby_settings").show();
+                $("#nearbydownload").attr("class","hide");
+                $("#nearby_snp").hide();
+                range = $("#range_nearby").val();
+                $.ajax({
+                    url: 'http://localhost:8080/cgi-bin/find_nearby_SNPs.py',
+                    type: 'get',
+                    data: {'submit':'submit','PDB':PDB,'residue':residue,'chain':chain,'range':range},
+                    success: function(response) {
+                        if (!$.trim(response)){
+                            //alert("No information for Nearby SNP for this SNP!");
+                            //$("#table1").attr("class","hide");}
+                            $("#nearby_snp tbody").html("");
+                            $("#snp_anno").hide();
+                            $("#table1 .loader").attr("class","unload");
+                            $("#table1 p").attr("class","hide");
+                            $("#table1_2 .loader").attr("class","unload");
+                            $("#table1_2 p").attr("class","hide");
+                        } else {
+                        var lines = response.trim().split('\n');
+                        //alert(response)
+                        //$("#table1").attr("class","table");
+                        //$("#table1 .unload").attr("class","loader");
+                        //$("#table1 p").attr("class","");
+                        //$("#nearbydownload").attr("class","hide");
+
+                        //$('#nearby_snp').empty();
+                        //clean table: may have better way?
+                        //$("#nearby_snp tr:not(:first)").html("");
+                        $("#nearby_snp tbody").html("");
+                        //$("#nearby_snp").append("<thead><tr><th><input id="selectall" type="checkbox" onclick="swapCheck()" ></th><th> Name </th><th> chr </th><th> Position </th><th> Chain  </th><th> Residue </th><th> PDBID </th><th> ENST </th><th> Consequence </th><th> Sift Prediction </th><th> Sift Score </th><th> Polyphen Prediction </th><th> Polyphen Score </th></tr></thead><tbody>");
+                        lines.forEach(function(value){
+                            row = value.split("\t");
+                            $('#nearby_snp').append("<tr><td><input class='son_check' type='checkbox' name='NBS' value="+row[3]+","+row[4]+" /></td><td class='rs_nearby' style='text-decoration:underline;cursor:pointer;'>"+row[0]+"</td><td>"+row[1]+"</td><td>"+row[2]+"</td><td>"+row[3]+"</td><td>"+row[4]+"</td><td>"+row[5]+"</td><td>"+row[6]+"</td><td>"+row[7]+"</td><td>"+row[8]+"</td><td>"+row[9]+"</td><td>"+row[10]+"</td><td>"+row[11]+"</td></tr>");
+                        });
+                        $('#nearby_snp').append("</tbody>");
+                        $("#nearby_snp").trigger("update");
+                        $("#table1 h4").attr('class','');
+                        $("#table1_2 h4").attr('class','');
+                        //$("#nearby_snp").attr("class","tablesorter");
+                        $("#table1 .loader").attr("class","unload");
+                        $("#table1 p").attr("class","hide");
+                        $("#table1_2 .loader").attr("class","unload");
+                        $("#table1_2 p").attr("class","hide");
+                        $("#nearby_snp").tablesorter({theme: 'blue'});
+                        $("#nearby_snp").show();
+                        if ( $('.focus-highlight').length ) {
+                            $('.focus-highlight').find('td, th')
+                            .attr('tabindex', '1')
+                            // add touch device support
+                            .on('touchstart', function() {
+                                $(this).focus();
+                            });
+                        }
+                        $("#nearbydownload").attr("class","");
+                        /*
+                        $("div.link").empty();
+                        var range = $("#range_nearby").val();
+                        var main_chain = $("#prosnptable tr:eq(1) td").eq(3).html();
+                        var main_residue = $("#prosnptable tr:eq(1) td").eq(4).html();
+                        var nearby_url = '<a href="javascript:void(0)" onclick="window.open(&quot;https://chemapps.stolaf.edu/jmol/jmol.php?pdbid='+PDB+'&amp;width=100%&amp;height=100%&amp;script=restrict+not+water%3B+spacefill+off%3B+wireframe+off%3B+ribbons+on%3B';
+                        $("#nearby_snp tr:gt(0)").each(function(){
+                            var n_chain = $(this).children("td:eq(4)").html();
+                            var n_residue = $(this).children("td:eq(5)").html();
+                            //alert(n_chain+n_residue);
+                            if (typeof(n_chain) != "undefined" && typeof(n_residue) != "undefined"){
+                                nearby_url = nearby_url + '+select+'+n_residue+'%3A'+n_chain+'%3B+color+blue%3B+spacefill+1.0%3B';
+                            };   
+                        });
+                        nearby_url = nearby_url +'+select+'+main_residue+'%3A'+main_chain+'%3B+color+red%3B+spacefill+1.0%3B';
+                        nearby_url = nearby_url +'+boundbox+{'+main_residue+'%3A'+main_chain+'}+{'+range+','+range+','+range+'}%3Bdraw+boundbox+MESH+NOFILL&quot;,&quot;&quot;,&quot;width=600,height=600,scrollbars=no&quot;)">protein_highlighted</a>';
+                        $("div.link").append(nearby_url);
+                        $("div.link a").trigger('click');
+                        */
+                        }
+                    }
+                });
+            };
+
+        });
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Gene2Protein</title>
+        <link rel="stylesheet" href="webpage.css">
+    </head>
+<style>
+
+h2,p,div{
+    //max-width:1200px;
+    //min-width:100px;
+    //text-align:center;
+} 
+
+h2{
+   color:dodgerblue;
+}
+
+</style>   
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li style='margin-left:1350px;'><img src='http://localhost:8080/bulogo.png' alt='BU logo' width="85%" height="85%"/></li>
+                    <center><strong style='font-size:30px'>Gene2Protein</strong></center>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_v1.html">Home</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/tutorial.html">Tutorial</a></li>
+                    <li style='display:inline-block;margin-right:5px;'><a style='text-decoration:underline;' href="http://localhost:8080/webpage_contact.html">Contact</a></li>
+
+                </ul>
+            </nav>
+        </header>
+        <div class="tutorial" style='margin: 0 auto;width: 800px;'>
+            <br><br>
+            This tutorial contains 3 Part: <u><a style='color:black' href='#gene'>Gene</a></u>, 
+                                           <u><a style='color:black' href='#snp'>SNP</a></u>, 
+                                           <u><a style='color:black' href='#protein'>Protein</a></u>, 
+                                           <u><a style='color:black' href='https://youtu.be/2GDb3SccYGY' target='_blank'>Video</a></u>, 
+                                           <u><a style='color:black' href='https://github.com/Xudong-Han/Gene2Protein/raw/master/Gene2Protein%20-%20JC%20-%208-6-20.pptx' target='_blank'>Download</a></u>.<br>
+          
+            <h2 id='gene' style="text-align:center">Gene</h2>
+            <p style='text-align:justify'>In Gene part, the available input types are Gene symbol, ENSG (Ensembl gene ID) and gene coordinate (chromosome and position). By providing the gene symbol or ENSG ID,</p><br>
+            <img src="http://localhost:8080/symbol_ensg.png" width=80% height=80% ></img><br><br>
+            <p style="text-align: justify">By clicking these links, the website will be redirected to other external databases</p>
+            <img src="http://localhost:8080/External_links.png" width="80%" height=80% > <img><br><br>
+            <p style='text-align:justify'>two tables includes symbol, ENSG ID, gene coordinate, gene full name, gene description, corresponding Isoform ID and PDB ID would be shown. An additional GWAS catalog annotation on this gene would also be shown on the bottom of the page.
+            </p><br>
+            <img src="http://localhost:8080/gene_isoform_table.png" width=80% height=80%  ></img><br>
+            <img src="http://localhost:8080/GWAS_catalog.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>A genome browser would also be shown together with the introns and exons corresponding to that gene, as well as the recombination rate and GWAS catalog for relevant SNPs. The position range of the genome browser would be +/- 25000 bp of the start/end site of that gene and therefore any closed gene on that chromosome could also be visualized.
+            </p><br>
+            <img src="http://localhost:8080/gene_browser.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>Another isoform browser is also available, which shows different isoforms (ENST) of that gene.</p>    
+            <img src="http://localhost:8080/isoforms_browser.png" width=80% height=80%  ></img><br><br> 
+            <p style='text-align:justify'> By clicking the isoform on the isoform table, the structure of that isoform will be shown solely.</p><br>
+            <img src="http://localhost:8080/isoform_click.png" width=80% height=80%  ></img><br><br>
+            <p style="text-align:justify"> At the bottom of the page, there is a SIFT and Polyphen Prediction table</p>
+            <img src="http://localhost:8080/SIFT_bottom.png" width="80%" height="80%"> </img> <br>
+            <img src="http://localhost:8080/single_isoform_browser.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>Additionally, a table contains the information of SNPs on this gene would be shown. The table initially provides the SNPs only in the Exomes. You can change is by clicking the Genomes option</p><br> 
+            <img src="http://localhost:8080/SNP_table.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>By clicking the SNP in the SNP table, it will pop out a new webpage. The information and the annotation of that SNP will be shown on the new page. The position of that SNP will be shown on the two genome browsers as a red vertical line. The remains of the figures are the same with the genome browser above. For the following available steps for SNP, please refer to SNP part. 
+            </p><br>
+            <img src="http://localhost:8080/snp_click.png" width=80% height=80%  ></img><br>
+            <img src="http://localhost:8080/VEP.png" width=100% height=100%  ></img><br>
+            <img src="http://localhost:8080/PF.png" width=80% height=80%  ></img><br>
+            <img src="http://localhost:8080/SNP_gene_browser.png" width=80% height=80%  ></img><br>
+            <img src="http://localhost:8080/SNP_isoforms_browser.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>If user provides the range of the position and select the chromosome,</p><br>
+            <img src="http://localhost:8080/range_input.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>a genome browser include all the genes within the range, together with GWAS catalog SNP information and recombination rate will be shown.</p><br>
+            <img srci="http://localhost:8080/gene_browser.png" width=80% height=80%  ></img><br><br>
+        </div>
+
+        <div class="tutorial" style='margin: 0 auto;width: 800px;'>
+            <h2 id="snp" style="text-align:center">SNP</h2>
+            <p style='text-align:justify'>In this part, the available input types are dbSNP ID (rsID) or base position (chr:position). By providing the SNP ID or its position,</p><br>
+            <img src="http://localhost:8080/snp_input.png" width=80% height=80% ></img><br><br>
+            <p style='text-align:justify'>users are able to view its information (SNP table), annotation (Variant Effect Predictor(SIFT and Polyphen), Population frequency table) as well as the corresponding gene and isoform information.</p><br><br>
+            <img src="http://localhost:8080/VEP.png" width=80% height=80% ></img><br>
+            <img src="http://localhost:8080/PF.png" width=80% height=80% ></img><br><br>
+            <p style='text-align:justify'>Similarly, two genome browsers would also be shown with the corresponding SNP representing as a red line.</p> 
+            <img src="http://localhost:8080/SNP_gene_browser.png" width=80% height=80%  ></img><br>
+            <img src="http://localhost:8080/SNP_isoforms_browser.png" width=80% height=80%  ></img><br><br>
+            <p style='text-align:justify'>Additionally, one novel feature of this application is that the SNP could be visualized in the 3D protein structure. By clicking on the link of the PDBID, the corresponding 3D protein structure could be visualized with highlighting the selected SNP coding amino acid. For the operations in viewing 3D protein structure, please refer to Protein part.</p>
+        </div>
+        <div class="tutorial" style='margin: 0 auto;width: 800px;'>
+            <h2 id='protein' style="text-align:center">Protein</h2>
+        <p style='text-align:justify'>Users can input an PDB ID from the main page. </p>
+        <img src="http://localhost:8080/searchpdb.png" width=80% height=80%  ></img><br><br>
+
+        <p style='text-align:justify'>Then a new page for the specific PDB entry will appear. In the new page, there will be a link to see the 3D structure of the PDB entry. In addition, there will be a SNP table at the bottom page which includes all the SNP position available for the PDB.</p> 
+        <img src="http://localhost:8080/protein_page1.png" width=80% height=80%  ></img><br><br>
+      <img src="http://localhost:8080/protein_structure.png" width=40% height=40%  ></img><br><br>
+      <img src="http://localhost:8080/protein_page3.png" width=80% height=80%  ></img><br><br>
+        <p style='text-align:justify'>Users can enter SNP ID or exact risidue number and chain number for a specific SNP residue on the protein, and a new link to the PDB entry which highlights the SNP position on the 3D structure will appear on the page. In addition, users can also click on a SNP ID in the SNP table, and easily highlight it in the 3D structure.</p>
+      <img src="http://localhost:8080/protein_page2.png" width=80% height=80%  ></img><br><br>
+      <img src="http://localhost:8080/protein_structure_snp.png" width=40% height=40%  ></img><br><br>
+      <img src="http://localhost:8080/PDB_Page_HLT_click.png" width=80% height=80%  ></img><br><br>
+        <p style='text-align:justify'>Finally, users can choose the range (from 3 to 9 angstrom) for nearby SNPs via the advanced settings, then a new table of residues within a specific angstrom of the selected SNP residue will be shown.</p><br> 
+       <p style='text-aligh:justify'>Its last column will indicate if the residue is a SNP or not. Users can view the position of the nearby residue(in blue color) by clicking the button. </p><br><br>
+      <img src="http://localhost:8080/protein_page4.png" width=100% height=100%  ></img><br><br>
+      <img src="http://localhost:8080/protein_structure_nearby.png" width=40% height=40%  ></img><br><br>
+        </div>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        
+    
+    </body>
+</html>
+
+
